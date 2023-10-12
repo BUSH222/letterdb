@@ -1,9 +1,9 @@
 from flask import Flask, render_template, send_file
 import os
-from pathlib import Path
+
 
 app = Flask(__name__)
-DB_REL_DIR = 'db'
+DB_REL_DIR = 'db' # fix later
 DOCTXT_REL_DIR = 'documents-txt'
 DOC_REL_DIR = 'documents'
 
@@ -22,13 +22,13 @@ def index():
     return render_template('index.html', data=data)
 
 
-
 @app.route('/viewitem/<string:itemindex>')
 def viewitem(itemindex):
     for s in os.listdir(DOCTXT_REL_DIR):
-        if os.path.isfile(os.path.join(DOCTXT_REL_DIR,s)) and s.startswith(itemindex):
-            return send_file(os.path.join(DOC_REL_DIR,f'{s.rsplit(".", 1)[0]}.doc'))
+        if os.path.isfile(os.path.join(DOCTXT_REL_DIR, s)) and s.startswith(itemindex):
+            return send_file(os.path.join(DOC_REL_DIR, f'{s.rsplit(".", 1)[0]}.doc'))
     return "NO FILE FOUND"
+
 
 if __name__ == '__main__':
     app.run(debug=True)
