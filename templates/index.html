@@ -1,16 +1,33 @@
-<table>
-    <thead>
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+        table, th, td {
+            border: 2px solid black;
+            border-collapse: collapse;
+        }
+        
+        </style>
+    </head>
+    <table style="width:100%">
         <tr>
-            <th>Name</th>
-            <th>Age</th>
+            <th style="width:10%">Catalogue Number</th>
+            <th style="width:10%">Date</th>
+            <th>Adressee</th>
+            <th>Keywords</th>
+            <th>Regions</th>
+            <th style="width:5%">Source</th>
         </tr>
-    </thead>
-    <tbody>
-        {% for user in users %}
+
+        {% for item in data %}
         <tr>
-            <td>{{ user.name }}</td>
-            <td>{{ user.age }}</td>
+            <td>{{item.catalogue}}</td>
+            <td>{{item.date}}</td>
+            <td>{{item.addressee}}</td>
+            <td>{{item.keywords}}</td>
+            <td>{{item.regions}}</td>
+            <td><button onclick="location.href='viewitem/{{item.catalogue}}'">View Source</button></td>
         </tr>
         {% endfor %}
-    </tbody>
-</table>
+    </table>
+</html>
