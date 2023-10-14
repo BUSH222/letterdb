@@ -3,7 +3,7 @@ import os
 import glob
 
 
-DOC_REL_DIR = 'doc-testfin'
+DOC_REL_DIR = 'documents'
 DOC_OUT_REL_DIR = 'documents-txt'
 
 

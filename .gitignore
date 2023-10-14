@@ -5,6 +5,7 @@
 *.docx
 *.xls
 *.xlsx
+*.txt
 
 # ignored folders
 doc-testfin/
