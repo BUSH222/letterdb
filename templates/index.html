@@ -1,33 +1,33 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <style>
-        table, th, td {
-            border: 2px solid black;
-            border-collapse: collapse;
-        }
-        
-        </style>
+        <link rel="stylesheet" href="static/styles.css">
     </head>
-    <table style="width:100%">
-        <tr>
-            <th style="width:10%">Catalogue Number</th>
-            <th style="width:10%">Date</th>
-            <th>Adressee</th>
-            <th>Keywords</th>
-            <th>Regions</th>
-            <th style="width:5%">Source</th>
-        </tr>
-
-        {% for item in data %}
-        <tr>
-            <td>{{item.catalogue}}</td>
-            <td>{{item.date}}</td>
-            <td>{{item.addressee}}</td>
-            <td>{{item.keywords}}</td>
-            <td>{{item.regions}}</td>
-            <td><button onclick="location.href='viewitem/{{item.catalogue}}'">View Source</button></td>
-        </tr>
-        {% endfor %}
-    </table>
+    <body>
+        <table style="width:100%" id="MainTable" class="table">
+            <thead>
+            <tr>
+                <th onclick="sortTable(0)" style="width:10%">Catalogue Number</th>
+                <th onclick="sortTable(1)"style="width:10%">Date</th>
+                <th onclick="sortTable(2)">Adressee</th>
+                <th>Keywords</th>
+                <th>Regions</th>
+                <th style="width:5%">Source</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in data %}
+            <tr>
+                <td>{{item.catalogue}}</td>
+                <td>{{item.date}}</td>
+                <td>{{item.addressee}}</td>
+                <td>{{item.keywords}}</td>
+                <td>{{item.regions}}</td>
+                <td><button onclick="location.href='viewitem/{{item.catalogue}}'">View Source</button></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <script src="static/script_main.js"></script>
+    </body>
 </html>

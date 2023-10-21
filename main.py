@@ -1,25 +1,31 @@
 from flask import Flask, render_template, send_file
 import os
+import sqlite3
 
 
 app = Flask(__name__)
 DB_REL_DIR = 'db' # fix later
 DOCTXT_REL_DIR = 'documents-txt'
 DOC_REL_DIR = 'documents'
+# LOAD DATA AT START
+print('Letter data loading...')
+con = sqlite3.connect("maindb.db")
+cur = con.cursor()
+con.row_factory = sqlite3.Row
+cur.execute("SELECT * FROM letterdb")
+DATA = cur.fetchall()
+#DATA.sort(key=lambda x:x[0])
+print('Letter data loaded.')
+
 
 
 @app.route('/')
 def index():
-    # TEMPORARY DATA
-    data = [
-        {"catalogue": "000", "date":"Unknwn", "adressee": "Мартьянов", "keywords": "", "regions":""},
-        {"catalogue": "001", "date":"Unknwn", "adressee": "Грав", "keywords": "", "regions":""}, 
-        {"catalogue": "002", "date":"1952", "adressee": "Ларищев", "keywords": "", "regions":""}, 
-        {"catalogue": "003", "date":"Unknwn", "adressee": "Смирнов", "keywords": "", "regions":""}, 
-        {"catalogue": "004", "date":"1955", "adressee": "Сергей Васильевич", "keywords": "", "regions":""}, 
-
-    ]
-    return render_template('index.html', data=data)
+    global DATA
+    findata = []
+    for elem in DATA:
+        findata.append({"catalogue": elem[0], "date":elem[1], "addressee": elem[2], "keywords": elem[3], "regions":elem[4]})
+    return render_template('index.html', data=findata)
 
 
 @app.route('/viewitem/<string:itemindex>')
