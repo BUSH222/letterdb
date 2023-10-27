@@ -37,12 +37,12 @@ def load_data():
         with open(filename, "r") as file_data:
             file_contents = file_data.read()
         fin_values = tuple(filename_data) + (file_contents, filename_raw)
-        cur.execute("INSERT INTO letterdb (catalogue, date, adressee, contents_txt, filename)"\
+        cur.execute("INSERT INTO letterdb (catalogue, date, adressee, contents_txt, filename)"
                     "VALUES (?, ?, ?, ?, ?)", fin_values)
         con.commit()
 
 
-create_table(force=True)
-load_data()
+# create_table(force=True)
+# load_data()
 
 con.close()

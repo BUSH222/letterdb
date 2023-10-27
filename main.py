@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_file, request
+from flask import Flask, render_template, send_file, redirect, request, url_for
 import os
 import sqlite3
 import re
@@ -33,7 +33,6 @@ print('Letter data loaded.')
 
 def filter_data(data, filter_dict, sorting_params=[]):
     """Filter the data to return the values for /search."""
-    # assert all([m in sorting_params for m in CHECKBOX_INPUT_FIELDS]) or len(sorting_params) == 0
     filtered_data = []
 
     if 'published' in sorting_params:
@@ -62,7 +61,7 @@ def filter_data(data, filter_dict, sorting_params=[]):
 @app.route('/')
 def index():
     """The main page of the website."""
-    return render_template('index.html', data=DATADICT)
+    return redirect(url_for('search'))
 
 
 @app.route('/viewitem/<string:itemindex>')
@@ -74,23 +73,26 @@ def viewitem(itemindex):
     return 'NO FILE FOUND'
 
 
-@app.route('/search', methods=['POST'])
+@app.route('/search', methods=['POST', 'GET'])
 def search():
     """Return the search values."""
-    query = dict(request.form)
-    print(query)
-    textfields = {}
-    checkbox_items_on = []
+    if request.method == 'POST':
+        query = dict(request.form)
+        print(query)
+        textfields = {}
+        checkbox_items_on = []
 
-    for s in query.items():
-        if s[0] in TEXT_INPUT_FIELDS:
-            textfields[s[0]] = s[1]
-        elif s[0] in CHECKBOX_INPUT_FIELDS and s[1] == 'on':
-            checkbox_items_on.append(s[0])
+        for s in query.items():
+            if s[0] in TEXT_INPUT_FIELDS:
+                textfields[s[0]] = s[1]
+            elif s[0] in CHECKBOX_INPUT_FIELDS and s[1] == 'on':
+                checkbox_items_on.append(s[0])
 
-    print(textfields)
-    print(checkbox_items_on)
-    return render_template('index.html', data=filter_data(DATADICT, textfields, sorting_params=checkbox_items_on))
+        print(textfields)
+        print(checkbox_items_on)
+        return render_template('search.html', data=filter_data(DATADICT, textfields, sorting_params=checkbox_items_on))
+    else:
+        return render_template('search.html', data=DATADICT)
 
 
 if __name__ == '__main__':
