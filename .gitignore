@@ -7,6 +7,9 @@
 *.xlsx
 *.txt
 
+# secret keys
+.env
+
 # ignored folders
 doc-testfin/
 documents/
