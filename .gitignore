@@ -7,8 +7,9 @@
 *.xlsx
 *.txt
 
-# secret keys
+# secret keys and user data
 .env
+sqlite_db
 
 # ignored folders
 doc-testfin/

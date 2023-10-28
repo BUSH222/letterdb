@@ -3,6 +3,7 @@ import sqlite3
 import glob
 import re
 from dotenv import load_dotenv
+import requests
 
 load_dotenv()  # load secret keys
 
@@ -13,17 +14,25 @@ DOC_REL_DIR = 'documents'
 TEXT_INPUT_FIELDS = ['catalogue', 'date', 'addressee', 'keywords', 'regions']
 CHECKBOX_INPUT_FIELDS = ['case-sensitive', 'use-regex', 'replace-e', 'published']
 
-CLIENT_SECRET = environ["GOOGLE_CLIENT_SECRET"]
-CLIENT_ID = environ["GOOGLE_CLIENT_ID"]
+GOOGLE_CLIENT_SECRET = environ.get("GOOGLE_CLIENT_SECRET", None)
+GOOGLE_CLIENT_ID = environ.get("GOOGLE_CLIENT_ID", None)
+GOOGLE_DISCOVERY_URL = (
+    "https://accounts.google.com/.well-known/openid-configuration"
+)
 
 con = sqlite3.connect(DB_FILE)
 cur = con.cursor()
 print('Dependencies loaded.')
 
 
+def get_google_provider_cfg():
+    """Return the google provider config in a json format."""
+    return requests.get(GOOGLE_DISCOVERY_URL).json()
+
+
 def unload_data():
     global con, cur
-    """Unload the data from DB_FILE to variable DATADICT"""
+    """Unload the data from DB_FILE to variable DATADICT."""
     con.row_factory = sqlite3.Row
     cur.execute('SELECT * FROM letterdb')
     # Data processing
