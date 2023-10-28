@@ -4,6 +4,7 @@ import glob
 import re
 from dotenv import load_dotenv
 import requests
+import json
 
 load_dotenv()  # load secret keys
 
@@ -19,6 +20,8 @@ GOOGLE_CLIENT_ID = environ.get("GOOGLE_CLIENT_ID", None)
 GOOGLE_DISCOVERY_URL = (
     "https://accounts.google.com/.well-known/openid-configuration"
 )
+
+APPROVED_EMAILS = json.loads(environ.get("APPROVED_EMAILS", None))
 
 con = sqlite3.connect(DB_FILE)
 cur = con.cursor()
@@ -77,7 +80,15 @@ def create_table(force=False):
     global cur, con
     if force:
         cur.execute("DROP TABLE IF EXISTS letterdb")
-    cur.execute("CREATE TABLE IF NOT EXISTS letterdb(catalogue, date, adressee, keywords, regions, contents_txt, filename)")
+    cur.execute("""CREATE TABLE IF NOT EXISTS letterdb (
+                catalogue,
+                date,
+                adressee,
+                keywords,
+                regions,
+                contents_txt,
+                filename
+                )""")
 
 
 def load_data():
