@@ -160,7 +160,6 @@ def search():
     """Return the search values."""
     if request.method == 'POST':
         query = dict(request.form)
-        print(query)
         textfields = {}
         checkbox_items_on = []
 
@@ -170,8 +169,6 @@ def search():
             elif s[0] in CHECKBOX_INPUT_FIELDS and s[1] == 'on':
                 checkbox_items_on.append(s[0])
 
-        print(textfields)
-        print(checkbox_items_on)
         return render_template('search.html', data=filter_data(DATADICT, textfields, sorting_params=checkbox_items_on))
     else:
         return render_template('search.html', data=DATADICT)

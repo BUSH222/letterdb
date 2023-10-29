@@ -16,7 +16,7 @@
                 </tr>
             </thead>
             <tbody>
-                <form action="/search" method="post">
+                <form action="/search" method="post" autocomplete="off">
                     <tr>
                         <td><input type="text" id="catalogue" name="catalogue"></td>
                         <td><input type="text" id="date" name="date"></td>
@@ -30,8 +30,7 @@
                         <td>Use RegEx: <input type="checkbox" id="use-regex" name="use-regex"></td>
                         <td>Replace ё <input type="checkbox" id="replace-e" name="replace-e" checked></td>
                         <td>Published <input type="checkbox" id="published" name="published"></td>
-                        <td colspan="2">Search in letter contents: <input type="text" id="contents" name="contents"></td></form> 
-                        <td><button onclick="location.href='/export'">Export search results</td>
+                        <td colspan="3">Search in letter contents: <input type="text" id="contents" name="contents"></td></form> 
                     </tr>
                 
             </tbody>
