@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="static/styles.css">
+    </head>
+    <body>
+        <table class="searchTable">
+            <thead>
+                <tr>
+                    <th style="width:10%">№</th>
+                    <th style="width:10%">Date</th>
+                    <th colspan="2">Adressee</th>
+                    <th>Keywords</th>
+                    <th>Regions</th>
+                    <th style="width:5%">Search</th>
+                </tr>
+            </thead>
+            <tbody>
+                <form action="/search" method="post" autocomplete="off">
+                    <tr>
+                        <td><input type="text" id="catalogue" name="catalogue"></td>
+                        <td><input type="text" id="date" name="date"></td>
+                        <td colspan="2"><input type="text" id="addressee" name="addressee"></td>
+                        <td><input type="text" id="keywords" name="keywords"></td>
+                        <td><input type="text" id="regions" name="regions"></td>
+                        <td><input type="submit" value="Search"></button></td>
+                    </tr>
+                    <tr>
+                        <td >Case-sensitive: <input type="checkbox" id="case-sensitive" name="case-sensitive"></td>
+                        <td>Use RegEx: <input type="checkbox" id="use-regex" name="use-regex"></td>
+                        <td>Replace ё <input type="checkbox" id="replace-e" name="replace-e" checked></td>
+                        <td>Published <input type="checkbox" id="published" name="published"></td>
+                        <td colspan="3">Search in letter contents: <input type="text" id="contents" name="contents"></td></form> 
+                    </tr>
+                
+            </tbody>
+        </table>
+        <table id="MainTable" class="table">
+            <thead>
+            <tr>
+                <th onclick="sortTable(0)" style="width:10%"><centrе>№</centr></th>
+                <th onclick="sortTable(1)" style="width:10%">Date</th>
+                <th onclick="sortTable(2)">Adressee</th>
+                <th>Keywords</th>
+                <th>Regions</th>
+                <th style="width:5%">Source</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in data %}
+            <tr>
+                <td>{{item.catalogue}}</td>
+                <td><centrе><b>{{item.date}}</b></centrе></td>
+                <td>{{item.addressee}}</td>
+                <td>{{item.keywords}}</td>
+                <td>{{item.regions}}</td>
+                <td><button onclick="location.href='viewitem/{{item.catalogue}}'">View Source</button></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <script src="static/script_main.js"></script>
+    </body>
+</html>

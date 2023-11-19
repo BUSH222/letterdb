@@ -1,64 +1,136 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <link rel="stylesheet" href="static/styles.css">
-    </head>
-    <body>
-        <table class="searchTable">
-            <thead>
-                <tr>
-                    <th style="width:10%">№</th>
-                    <th style="width:10%">Date</th>
-                    <th colspan="2">Adressee</th>
-                    <th>Keywords</th>
-                    <th>Regions</th>
-                    <th style="width:5%">Search</th>
-                </tr>
-            </thead>
-            <tbody>
-                <form action="/search" method="post" autocomplete="off">
-                    <tr>
-                        <td><input type="text" id="catalogue" name="catalogue"></td>
-                        <td><input type="text" id="date" name="date"></td>
-                        <td colspan="2"><input type="text" id="addressee" name="addressee"></td>
-                        <td><input type="text" id="keywords" name="keywords"></td>
-                        <td><input type="text" id="regions" name="regions"></td>
-                        <td><input type="submit" value="Search"></button></td>
-                    </tr>
-                    <tr>
-                        <td >Case-sensitive: <input type="checkbox" id="case-sensitive" name="case-sensitive"></td>
-                        <td>Use RegEx: <input type="checkbox" id="use-regex" name="use-regex"></td>
-                        <td>Replace ё <input type="checkbox" id="replace-e" name="replace-e" checked></td>
-                        <td>Published <input type="checkbox" id="published" name="published"></td>
-                        <td colspan="3">Search in letter contents: <input type="text" id="contents" name="contents"></td></form> 
-                    </tr>
-                
-            </tbody>
-        </table>
-        <table id="MainTable" class="table">
-            <thead>
-            <tr>
-                <th onclick="sortTable(0)" style="width:10%"><centrе>№</centr></th>
-                <th onclick="sortTable(1)" style="width:10%">Date</th>
-                <th onclick="sortTable(2)">Adressee</th>
-                <th>Keywords</th>
-                <th>Regions</th>
-                <th style="width:5%">Source</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for item in data %}
-            <tr>
-                <td>{{item.catalogue}}</td>
-                <td><centrе><b>{{item.date}}</b></centrе></td>
-                <td>{{item.addressee}}</td>
-                <td>{{item.keywords}}</td>
-                <td>{{item.regions}}</td>
-                <td><button onclick="location.href='viewitem/{{item.catalogue}}'">View Source</button></td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        <script src="static/script_main.js"></script>
-    </body>
+<html> 
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="generator" content="RocketCake">
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="static/search_html.css">
+</head>
+<body>
+<div class="textstyle1">
+<div id="container_121cac33"><div id="container_121cac33_padding" ><div class="textstyle1">  <span class="textstyle2"><br/></span>
+<h1 id="heading_6779c72">&#1055;&#1086;&#1080;&#1089;&#1082; &#1087;&#1086; &#1087;&#1080;&#1089;&#1100;&#1084;&#1072;&#1084;</h1></div>
+<div style="clear:both"></div></div></div>  </div>
+<div class="textstyle3">
+<div id="container_1ee20c64"><div id="container_1ee20c64_padding" ><div class="textstyle1">  <div id="menu_733ed3e1">
+    <div  class="menuholder1"><a href="javascript:void(0);">
+	<div id="menuentry_1f3203a9"  class="menustyle1 menu_733ed3e1_mainMenuEntry mobileEntry">
+		<div class="menuentry_text1">
+      <span class="textstyle4">Menu &#9660;</span>
+		</div>
+	</div>
+</a>
+<a href="index.html" style="text-decoration:none">
+	<div id="menuentry_22f9d2c5"  class="menustyle1 menu_733ed3e1_mainMenuEntry normalEntry">
+		<div class="menuentry_text2">
+      <span class="textstyle5">&#1054; &#1087;&#1080;&#1089;&#1100;&#1084;&#1072;&#1093;</span>
+		</div>
+	</div>
+</a>
+<a href="about.html" style="text-decoration:none">
+	<div id="menuentry_13002dc2"  class="menustyle2 menu_733ed3e1_mainMenuEntry normalEntry">
+		<div class="menuentry_text2">
+      <span class="textstyle5">&#1050;&#1072;&#1090;&#1072;&#1083;&#1086;&#1075;</span>
+		</div>
+	</div>
+</a>
+<a href="contact.html" style="text-decoration:none">
+	<div id="menuentry_5aa64af4"  class="menustyle3 menu_733ed3e1_mainMenuEntry normalEntry">
+		<div class="menuentry_text2">
+      <span class="textstyle5">&#1050;&#1086;&#1085;&#1090;&#1072;&#1082;&#1090;&#1099;</span>
+		</div>
+	</div>
+</a>
+
+	<script type="text/javascript" src="rc_images/wsp_menu.js"></script>
+	<script type="text/javascript">
+		var js_menu_733ed3e1= new wsp_menu('menu_733ed3e1', 'menu_733ed3e1', 10, null, true);
+
+		js_menu_733ed3e1.createMenuForItem('menuentry_1f3203a9', ["      <span class=\"textstyle6\">&#1054; &#1087;&#1080;&#1089;&#1100;&#1084;&#1072;&#1093;</span> ", 'index.html', '',
+		                                   "      <span class=\"textstyle6\">&#1050;&#1072;&#1090;&#1072;&#1083;&#1086;&#1075;</span> ", 'about.html', '',
+		                                   "      <span class=\"textstyle6\">&#1050;&#1086;&#1085;&#1090;&#1072;&#1082;&#1090;&#1099;</span> ", 'contact.html', '']);
+		js_menu_733ed3e1.createMenuForItem('menuentry_22f9d2c5', []);
+		js_menu_733ed3e1.createMenuForItem('menuentry_13002dc2', []);
+		js_menu_733ed3e1.createMenuForItem('menuentry_5aa64af4', []);
+
+	</script>
+      </div>
+    </div>
+</div>
+<div style="clear:both"></div></div></div>  </div>
+<div class="textstyle1">
+<div id="container_29ee7549"><div id="container_29ee7549_padding" ><div class="textstyle3"><span class="textstyle7">&#1055;&#1086;&#1080;&#1089;&#1082; &#1087;&#1086; &#1087;&#1080;&#1089;&#1077;&#1084; &#1042;.&#1040;. &#1054;&#1073;&#1088;&#1091;&#1095;&#1077;&#1074;&#1072;</span><span class="textstyle8"><br/></span><ul id="ul_7b56f8c2" class="ulstyle1">
+<li><span class="textstyle8">&#1055;&#1086;&#1080;&#1089;&#1082; &#1087;&#1086; &#1087;&#1080;&#1089;&#1100;&#1084;&#1072;&#1084; &#1084;&#1086;&#1078;&#1085;&#1086; &#1086;&#1089;&#1091;&#1097;&#1077;&#1089;&#1090;&#1074;&#1083;&#1103;&#1090;&#1100;</span></li>
+</ul>
+<span class="textstyle8"> <br/></span><span class="textstyle7">&#1054; &#1087;&#1080;&#1089;&#1100;&#1084;&#1072;&#1093;</span><span class="textstyle8"><br/></span><ul id="ul_56f0257b" class="ulstyle1">
+<li><span class="textstyle9">&#1054;&#1073;&#1088;&#1091;&#1095;&#1077;&#1074; &#1057;.&#1042;.</span>  <span class="textstyle8"> &#1058;&#1074;&#1086;&#1088;&#1095;&#1077;&#1089;&#1082;&#1086;&#1077; </span>
+</li>
+</ul>
+<span class="textstyle8"> <br/> <br/></span><span class="textstyle7">&#1050;&#1072;&#1090;&#1072;&#1083;&#1086;&#1075; &#1087;&#1080;&#1089;&#1077;&#1084; </span><span class="textstyle8"><br/></span><ul id="ul_731bdc21" class="ulstyle1">
+<li><span class="textstyle8">&#1055;&#1086;&#1089;&#1084;&#1086;&#1090;&#1088;&#1080;&#1090;&#1077; &#1089;&#1087;&#1080;&#1089;&#1082;&#1080; &#1087;&#1080;&#1089;&#1077;&#1084; &#1042;.&#1040;. &#1054;&#1073;&#1088;&#1091;&#1095;&#1077;&#1074;&#1072; &#1087;&#1086; &#1088;&#1072;&#1079;&#1085;&#1099;&#1084; &#1090;&#1077;&#1084;&#1072;&#1084;</span></li>
+</ul>
+  <span class="textstyle8"> <br/><br/></span>
+</div>
+</div></div>  </div>
+<div class="textstyle3">
+<span class="textstyle10"></span>  </div>
+
+<table class="searchTable">
+	<thead>
+		<tr>
+			<th style="width:10%">№</th>
+			<th style="width:10%">Дата</th>
+			<th colspan="2">Адресат</th>
+			<th>Ключевые слова</th>
+			<th>Регионы</th>
+			<th style="width:5%">Поиск</th>
+		</tr>
+	</thead>
+	<tbody>
+		<form action="/search" method="post" autocomplete="off">
+			<tr>
+				<td><input type="text" id="catalogue" name="catalogue"></td>
+				<td><input type="text" id="date" name="date"></td>
+				<td colspan="2"><input type="text" id="addressee" name="addressee"></td>
+				<td><input type="text" id="keywords" name="keywords"></td>
+				<td><input type="text" id="regions" name="regions"></td>
+				<td><input type="submit" value="Поиск"></button></td>
+			</tr>
+			<tr>
+				<td>Учитывать регистр: <input type="checkbox" id="case-sensitive" name="case-sensitive"></td>
+				<td>Использовать RegEx: <input type="checkbox" id="use-regex" name="use-regex"></td>
+				<td>Заменить ё <input type="checkbox" id="replace-e" name="replace-e" checked></td>
+				<td>Опубликовано <input type="checkbox" id="published" name="published"></td>
+				<td colspan="3">Поиск по содержимому письма: <input type="text" id="contents" name="contents"></td></form> 
+			</tr>
+		
+	</tbody>
+</table>
+<table id="MainTable" class="table">
+	<thead>
+	<tr>
+		<th onclick="sortTable(0)" style="width:10%"><centrе>№</centr></th>
+		<th onclick="sortTable(1)" style="width:10%">Дата</th>
+		<th onclick="sortTable(2)">Адресат</th>
+		<th>Ключевые слова</th>
+		<th>Регионы</th>
+		<th style="width:5%">Источник</th>
+	</tr>
+	</thead>
+	<tbody>
+	{% for item in data %}
+	<tr>
+		<td>{{item.catalogue}}</td>
+		<td><centrе><b>{{item.date}}</b></centrе></td>
+		<td>{{item.addressee}}</td>
+		<td>{{item.keywords}}</td>
+		<td>{{item.regions}}</td>
+		<td><button onclick="location.href='viewitem/{{item.catalogue}}'">Посмотреть источник</button></td>
+	</tr>
+	{% endfor %}
+	</tbody>
+</table>
+<script src="static/script_main.js"></script>
+</body>
 </html>
