@@ -156,8 +156,10 @@ def viewitem(itemindex):
 
 
 @app.route('/search', methods=['POST', 'GET'])
+@app.route('/catalogue', methods=['POST', 'GET'])
 def search():
     """Return the search values."""
+    pathtopage = {'catalogue':'searchtableonly.html', 'search':'search.html'}
     if request.method == 'POST':
         query = dict(request.form)
         textfields = {}
@@ -169,9 +171,9 @@ def search():
             elif s[0] in CHECKBOX_INPUT_FIELDS and s[1] == 'on':
                 checkbox_items_on.append(s[0])
 
-        return render_template('search.html', data=filter_data(DATADICT, textfields, sorting_params=checkbox_items_on))
+        return render_template(pathtopage[request.path[1:]], data=filter_data(DATADICT, textfields, sorting_params=checkbox_items_on))
     else:
-        return render_template('search.html', data=DATADICT)
+        return render_template(pathtopage[request.path[1:]], data=DATADICT)
 
 
 if __name__ == '__main__':
