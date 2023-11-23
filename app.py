@@ -149,10 +149,13 @@ def logout():
 @app.route('/viewitem/<string:itemindex>')
 def viewitem(itemindex):
     """The page of a specific letter."""
-    for s in os.listdir(DOC_TXT_REL_DIR):
-        if os.path.isfile(os.path.join(DOC_TXT_REL_DIR, s)) and s.startswith(itemindex):
-            return send_file(os.path.join(DOC_REL_DIR, f'{s.rsplit(".", 1)[0]}.doc'))
-    return 'NO FILE FOUND'
+    if not itemindex.isdigit():
+        abort(400)
+    for elem in DATADICT:
+        if elem['catalogue'] == itemindex:
+            print(elem)
+            break
+    return render_template("letterview.html", data=elem)
 
 
 @app.route('/search', methods=['POST', 'GET'])
