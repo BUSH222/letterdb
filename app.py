@@ -163,6 +163,8 @@ def edititem(itemindex):
     """Edit page of a specific letter."""
     if not current_user.is_authenticated:
         abort(403)
+    if current_user.email not in APPROVED_EMAILS:
+        abort(403)
     if not itemindex.isdigit():
         abort(400)
     current_letter_data = {}
@@ -180,11 +182,11 @@ def finalise_edit(itemindex):
     global DATADICT
     if not current_user.is_authenticated:
         abort(403)
+    if current_user.email not in APPROVED_EMAILS:
+        abort(403)
     if not itemindex.isdigit():
         abort(400)
-
-    print(dict(request.form).keys())
-    
+    print(dict(request.form).keys())   
     cnt = 0
     for elem in DATADICT:
         if elem['catalogue'] == itemindex:
@@ -200,7 +202,7 @@ def finalise_edit(itemindex):
 @app.route('/catalogue', methods=['POST', 'GET'])
 def search():
     """Return the search values."""
-    pathtopage = {'catalogue':'searchtableonly.html', 'search':'search.html'}
+    pathtopage = {'catalogue': 'searchtableonly.html', 'search': 'search.html'}
     if request.method == 'POST':
         query = dict(request.form)
         textfields = {}
