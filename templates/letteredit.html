@@ -53,7 +53,7 @@
 <body>
 <div class="form-container">
   <h2>Edit a Record</h2>
-  <form action="/submit-your-form-endpoint" method="post">
+  <form action="/finalise_edit/{{data.catalogue}}" method="post">
     <div class="form-group">
       <label for="catalogue">Catalogue</label>
       <input type="text" id="catalogue" name="catalogue" value="{{data.catalogue}}">

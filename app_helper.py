@@ -25,7 +25,7 @@ GOOGLE_DISCOVERY_URL = (
 
 APPROVED_EMAILS = json.loads(environ.get("APPROVED_EMAILS", None))
 
-con = sqlite3.connect(DB_FILE)
+con = sqlite3.connect(DB_FILE, check_same_thread=False)
 cur = con.cursor()
 print('Dependencies loaded.')
 
@@ -123,6 +123,24 @@ def load_data():
         cur.execute("INSERT INTO letterdb (catalogue, date, adressee, contents_txt, filename)"
                     "VALUES (?, ?, ?, ?, ?)", fin_values)
         con.commit()
+
+
+def update_row(row, number):
+    """Updates the row in the database."""
+    global cur, con
+    query = f"""UPDATE letterdb
+SET catalogue = '{row["catalogue"]}',
+date = '{row["date"]}',
+adressee = '{row["addressee"]}',
+keywords = '{row["keywords"]}',
+regions = '{row["regions"]}',
+contents_txt = '{row["contents_txt"]}',
+filename = '{row["filename"]}',
+imagelink = '{row["imagelink"]}',
+published = '{row["published"]}'
+WHERE catalogue = '{number}';"""
+    cur.execute(query)
+    con.commit()
 
 
 def close_conn():

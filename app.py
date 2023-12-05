@@ -26,8 +26,6 @@ import requests
 from db import init_db_command
 from user import User
 from app_helper import (
-    DOC_TXT_REL_DIR,
-    DOC_REL_DIR,
     TEXT_INPUT_FIELDS,
     CHECKBOX_INPUT_FIELDS,
     GOOGLE_CLIENT_SECRET,
@@ -36,6 +34,7 @@ from app_helper import (
     unload_data,
     filter_data,
     get_google_provider_cfg,
+    update_row,
 )
 
 
@@ -158,6 +157,7 @@ def viewitem(itemindex):
             break
     return render_template("letterview.html", data=current_letter_data)
 
+
 @app.route('/edit/<string:itemindex>')
 def edititem(itemindex):
     """Edit page of a specific letter."""
@@ -172,6 +172,28 @@ def edititem(itemindex):
             current_letter_data = elem
             break
     return render_template("letteredit.html", data=current_letter_data)
+
+
+@app.route('/finalise_edit/<string:itemindex>', methods=['POST', 'GET'])
+def finalise_edit(itemindex):
+    """Finalise the editing process, save results."""
+    global DATADICT
+    if not current_user.is_authenticated:
+        abort(403)
+    if not itemindex.isdigit():
+        abort(400)
+
+    print(dict(request.form).keys())
+    
+    cnt = 0
+    for elem in DATADICT:
+        if elem['catalogue'] == itemindex:
+            if dict(request.form).keys() == elem.keys():
+                DATADICT[cnt] = dict(request.form)
+                break
+        cnt += 1
+    update_row(dict(request.form), itemindex)
+    return redirect(url_for('viewitem', itemindex=itemindex))
 
 
 @app.route('/search', methods=['POST', 'GET'])
