@@ -1,7 +1,6 @@
 from flask import (
     Flask,
     render_template,
-    send_file,
     redirect,
     request,
     url_for,
@@ -151,11 +150,15 @@ def viewitem(itemindex):
     """The page of a specific letter."""
     if not itemindex.isdigit():
         abort(400)
+    current_letter_data = {}
+
     for elem in DATADICT:
         if elem['catalogue'] == itemindex:
-            print(elem)
+            current_letter_data = elem
             break
-    return render_template("letterview.html", data=elem)
+    
+
+    return render_template("letterview.html", data=current_letter_data)
 
 
 @app.route('/search', methods=['POST', 'GET'])

@@ -34,8 +34,8 @@ def get_google_provider_cfg():
 
 
 def unload_data():
-    global con, cur
     """Unload the data from DB_FILE to variable DATADICT."""
+    global con, cur
     con.row_factory = sqlite3.Row
     cur.execute('SELECT * FROM letterdb')
     # Data processing
