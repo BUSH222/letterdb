@@ -156,9 +156,22 @@ def viewitem(itemindex):
         if elem['catalogue'] == itemindex:
             current_letter_data = elem
             break
-    
-
     return render_template("letterview.html", data=current_letter_data)
+
+@app.route('/edit/<string:itemindex>')
+def edititem(itemindex):
+    """Edit page of a specific letter."""
+    if not current_user.is_authenticated:
+        abort(403)
+    if not itemindex.isdigit():
+        abort(400)
+    current_letter_data = {}
+
+    for elem in DATADICT:
+        if elem['catalogue'] == itemindex:
+            current_letter_data = elem
+            break
+    return render_template("letteredit.html", data=current_letter_data)
 
 
 @app.route('/search', methods=['POST', 'GET'])

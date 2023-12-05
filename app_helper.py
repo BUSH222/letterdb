@@ -14,6 +14,8 @@ DOC_REL_DIR = 'documents'
 
 TEXT_INPUT_FIELDS = ['catalogue', 'date', 'addressee', 'keywords', 'regions']
 CHECKBOX_INPUT_FIELDS = ['case-sensitive', 'use-regex', 'replace-e', 'published']
+DATA_FIELDS = ['catalogue', 'date', 'addressee', 'keywords', 'regions',
+               'contents_txt', 'filename', 'imagelink', 'published']
 
 GOOGLE_CLIENT_SECRET = environ.get("GOOGLE_CLIENT_SECRET", None)
 GOOGLE_CLIENT_ID = environ.get("GOOGLE_CLIENT_ID", None)
@@ -43,7 +45,7 @@ def unload_data():
     DATA.sort(key=lambda x: x[0])
     DATADICT = []
     for elem in DATA:
-        DATADICT.append(dict(zip(TEXT_INPUT_FIELDS, elem)))
+        DATADICT.append(dict(zip(DATA_FIELDS, elem)))
     print('Letter data loaded.')
     return DATADICT
 
