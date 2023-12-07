@@ -59,21 +59,25 @@ client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
 @login_manager.user_loader
 def load_user(user_id):
+    """Load the user data."""
     return User.get(user_id)
 
 
 @app.route("/")
 def index():
+    """Index of the webpage."""
     return render_template('index.html')
 
 
 @app.route("/about")
 def about():
+    """About page."""
     return render_template('about.html')
 
 
 @app.route("/contact")
 def contact():
+    """Contact page."""
     return render_template('contact.html')
 
 
@@ -155,6 +159,12 @@ def viewitem(itemindex):
         if elem['catalogue'] == itemindex:
             current_letter_data = elem
             break
+
+    current_letter_data["hidden"] = "hidden"
+
+    if current_user.is_authenticated and current_user.email in APPROVED_EMAILS:
+        current_letter_data["hidden"] = ""
+
     return render_template("letterview.html", data=current_letter_data)
 
 
@@ -173,6 +183,7 @@ def edititem(itemindex):
         if elem['catalogue'] == itemindex:
             current_letter_data = elem
             break
+
     return render_template("letteredit.html", data=current_letter_data)
 
 
@@ -186,7 +197,7 @@ def finalise_edit(itemindex):
         abort(403)
     if not itemindex.isdigit():
         abort(400)
-    print(dict(request.form).keys())   
+    print(dict(request.form).keys())
     cnt = 0
     for elem in DATADICT:
         if elem['catalogue'] == itemindex:
@@ -214,7 +225,8 @@ def search():
             elif s[0] in CHECKBOX_INPUT_FIELDS and s[1] == 'on':
                 checkbox_items_on.append(s[0])
 
-        return render_template(pathtopage[request.path[1:]], data=filter_data(DATADICT, textfields, sorting_params=checkbox_items_on))
+        return render_template(pathtopage[request.path[1:]],
+                               data=filter_data(DATADICT, textfields, sorting_params=checkbox_items_on))
     else:
         return render_template(pathtopage[request.path[1:]], data=DATADICT)
 
