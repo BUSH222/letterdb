@@ -197,7 +197,6 @@ def finalise_edit(itemindex):
         abort(403)
     if not itemindex.isdigit():
         abort(400)
-    print(dict(request.form).keys())
     cnt = 0
     for elem in DATADICT:
         if elem['catalogue'] == itemindex:
