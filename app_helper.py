@@ -143,6 +143,15 @@ WHERE catalogue = '{number}';"""
     con.commit()
 
 
+def add_row(values):
+    """Adds another row to the database."""
+    cur.execute("INSERT INTO letterdb "
+                "(catalogue, date, adressee, keywords, regions,"
+                "contents_txt, filename, imagelink, published)"
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", tuple(values))
+    con.commit()
+
+
 def close_conn():
     """Close the connection."""
     con.close()

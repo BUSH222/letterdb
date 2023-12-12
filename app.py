@@ -35,6 +35,7 @@ from app_helper import (
     filter_data,
     get_google_provider_cfg,
     update_row,
+    add_row,
 )
 
 
@@ -168,6 +169,31 @@ def viewitem(itemindex):
     return render_template("letterview.html", data=current_letter_data)
 
 
+@app.route('/newletter')
+def newletter():
+    """The page for creating a new letter"""
+    if not current_user.is_authenticated:
+        abort(403)
+    if current_user.email not in APPROVED_EMAILS:
+        abort(403)
+    return render_template("newletter.html")
+
+
+@app.route('/finalise_new_letter', methods=['POST'])
+def finalise_new_letter():
+    """Finalise the process of creating a new letter."""
+    if not current_user.is_authenticated:
+        abort(403)
+    if current_user.email not in APPROVED_EMAILS:
+        abort(403)
+    formdata = dict(request.form)
+
+    DATADICT.append(formdata)
+    add_row(formdata.values())
+
+    return redirect(url_for("viewitem", itemindex=formdata["catalogue"]))
+
+
 @app.route('/edit/<string:itemindex>')
 def edititem(itemindex):
     """Edit page of a specific letter."""
@@ -213,6 +239,9 @@ def finalise_edit(itemindex):
 def search():
     """Return the search values."""
     pathtopage = {'catalogue': 'searchtableonly.html', 'search': 'search.html'}
+    hidden = 'display:none'
+    if current_user.is_authenticated:
+        hidden = ''
     if request.method == 'POST':
         query = dict(request.form)
         textfields = {}
@@ -223,11 +252,10 @@ def search():
                 textfields[s[0]] = s[1]
             elif s[0] in CHECKBOX_INPUT_FIELDS and s[1] == 'on':
                 checkbox_items_on.append(s[0])
-
-        return render_template(pathtopage[request.path[1:]],
-                               data=filter_data(DATADICT, textfields, sorting_params=checkbox_items_on))
+        tempdata = filter_data(DATADICT, textfields, sorting_params=checkbox_items_on)
+        return render_template(pathtopage[request.path[1:]], data=tempdata, hidden=hidden)
     else:
-        return render_template(pathtopage[request.path[1:]], data=DATADICT)
+        return render_template(pathtopage[request.path[1:]], data=DATADICT, hidden=hidden)
 
 
 if __name__ == '__main__':
