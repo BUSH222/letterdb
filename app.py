@@ -235,10 +235,8 @@ def finalise_edit(itemindex):
 
 
 @app.route('/search', methods=['POST', 'GET'])
-@app.route('/catalogue', methods=['POST', 'GET'])
 def search():
     """Return the search values."""
-    pathtopage = {'catalogue': 'searchtableonly.html', 'search': 'search.html'}
     hidden = 'display:none'
     if current_user.is_authenticated:
         hidden = ''
@@ -246,16 +244,15 @@ def search():
         query = dict(request.form)
         textfields = {}
         checkbox_items_on = []
-
         for s in query.items():
             if s[0] in TEXT_INPUT_FIELDS:
                 textfields[s[0]] = s[1]
             elif s[0] in CHECKBOX_INPUT_FIELDS and s[1] == 'on':
                 checkbox_items_on.append(s[0])
         tempdata = filter_data(DATADICT, textfields, sorting_params=checkbox_items_on)
-        return render_template(pathtopage[request.path[1:]], data=tempdata, hidden=hidden)
+        return render_template('search.html', data=tempdata, hidden=hidden)
     else:
-        return render_template(pathtopage[request.path[1:]], data=DATADICT, hidden=hidden)
+        return render_template('search.html', data=DATADICT, hidden=hidden)
 
 
 if __name__ == '__main__':
