@@ -182,7 +182,6 @@ def newletter():
 @app.route('/finalise_new_letter', methods=['POST'])
 def finalise_new_letter():
     """Finalise the process of creating a new letter."""
-    
     if not current_user.is_authenticated:
         abort(403)
     if current_user.email not in APPROVED_EMAILS:
