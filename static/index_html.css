@@ -29,7 +29,7 @@ a:hover { color:#B2B3B4; }
 #button_3ce31f95:hover span { color:#444444; }
 body { background-color:#737373; padding:0;  margin: 0; }
 .textstyle1 { text-align:center; }
-#container_6a5612c4 { vertical-align: top; position:relative; display: inline-block; width:100%; min-height:201px; max-width:1024px; background-color:#FFFFFF; background-image: url(rc_images/skyscraper1_dark.jpg); background-position:top center; background-size:cover;  }
+#container_6a5612c4 { vertical-align: top; position:relative; display: inline-block; width:100%; min-height:201px; max-width:1024px; background-color:#FFFFFF; background-image: url(rc_images/banner.jpg); background-position:top center; background-size:cover;  }
 #container_6a5612c4_padding { margin: 10px; display: block;  }
 .textstyle2 { font-size:12pt; font-family:Segoe, 'Segoe UI', 'Helvetica Neue', sans-serif; color:#000000;  }
 #heading_3830d4d5 { vertical-align: bottom; position:relative; display: inline-block; background:none; font-size:24pt; font-family:Segoe, 'Segoe UI', 'Helvetica Neue', sans-serif; color:#FFFFFF; text-align:left; font-weight:bold;  }
@@ -38,16 +38,16 @@ body { background-color:#737373; padding:0;  margin: 0; }
 .textstyle5 { font-size:16pt; font-family:Segoe, 'Segoe UI', 'Helvetica Neue', sans-serif; color:#E5B340; line-height: 1.5;  }
 #container_23932c22 { vertical-align: top; position:relative; display: inline-block; width:100%; min-height:14px; background-color:#2C2825;  }
 #container_23932c22_padding { margin: 10px; display: block;  }
-#menu_3dae042d { vertical-align: bottom; position:relative; display: inline-block; width:430px; height:34px; max-width:800px; text-align:left; background:none;  }
+#menu_3dae042d { vertical-align: bottom; position:relative; display: inline-block; width:320px; height:34px; max-width:800px; text-align:left; background:none;  }
 .menuholder1 { position: relative; overflow: hidden; width: 100%; height: 100%; }
 .menustyle1 { position:absolute; width:100px; height:34px; left:10px;  }
 .menuentry_text1 { position:absolute; top:0px; bottom:0px; left:0px; right:0px; margin-top:auto; margin-bottom:auto; margin-left:auto; margin-right:auto; height:20px;  }
 .textstyle6 { font-size:13pt; font-family:Segoe, 'Segoe UI', 'Helvetica Neue', sans-serif; color:#FFFFFF; font-weight:bold;  white-space: nowrap; }
 .menuentry_text2 { position:absolute; top:0px; bottom:0px; left:0px; right:0px; margin-top:auto; margin-bottom:auto; margin-left:auto; margin-right:auto; height:18px;  }
 .textstyle7 { font-size:12pt; font-family:Segoe, 'Segoe UI', 'Helvetica Neue', sans-serif; color:#FFFFFF; font-weight:bold;  white-space: nowrap; }
-.menustyle2 { position:absolute; width:100px; height:34px; left:110px;  }
-.menustyle3 { position:absolute; width:100px; height:34px; left:210px;  }
-.menustyle4 { position:absolute; width:100px; height:34px; left:310px;  }
+.menustyle2 { position:absolute; width:100px; height:34px; left:10px;  }
+.menustyle3 { position:absolute; width:100px; height:34px; left:110px;  }
+.menustyle4 { position:absolute; width:100px; height:34px; left:210px;  }
 .textstyle8 { font-size:15pt; font-family:Arial, Helvetica, sans-serif; color:#FFFFFF;  white-space: nowrap; }
 #container_22e4a421 { vertical-align: top; position:relative; display: inline-block; width:100%; min-height:70px; max-width:1024px; background-color:#FFFFFF;  }
 #container_4df4f27 { vertical-align: top; position:relative; display: inline-block; width:100%; min-height:150px; max-width:800px; background:none;  }
