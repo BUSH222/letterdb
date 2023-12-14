@@ -161,12 +161,12 @@ def viewitem(itemindex):
             current_letter_data = elem
             break
 
-    current_letter_data["hidden"] = "hidden"
+    hidden = "hidden"
 
     if current_user.is_authenticated and current_user.email in APPROVED_EMAILS:
-        current_letter_data["hidden"] = ""
+        hidden = ""
 
-    return render_template("letterview.html", data=current_letter_data)
+    return render_template("letterview.html", data=current_letter_data, hidden=hidden)
 
 
 @app.route('/newletter')
