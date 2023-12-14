@@ -12,7 +12,7 @@ DB_FILE = 'maindb.db'
 DOC_TXT_REL_DIR = 'documents-txt'
 DOC_REL_DIR = 'documents'
 
-TEXT_INPUT_FIELDS = ['catalogue', 'date', 'addressee', 'keywords', 'regions']
+TEXT_INPUT_FIELDS = ['catalogue', 'date', 'addressee', 'keywords', 'regions', 'contents']
 CHECKBOX_INPUT_FIELDS = ['case-sensitive', 'use-regex', 'replace-e', 'published']
 DATA_FIELDS = ['catalogue', 'date', 'addressee', 'keywords', 'regions',
                'contents_txt', 'filename', 'imagelink', 'published']
@@ -60,18 +60,21 @@ def filter_data(data, filter_dict, sorting_params=[]):
         match = True
         for key, value in filter_dict.items():
             finkey = str(d.get(key))
+            if key == 'contents':
+                finkey = str(d.get('contents_txt'))
+
             if 'use-regex' not in sorting_params:
                 value = value.replace('*', '.*')
             if 'replace-e' in sorting_params:
                 value = value.replace('ё', 'е')  # cyrillic
-                finkey = str(d.get(key)).replace('ё', 'е')
+                finkey = finkey.replace('ё', 'е')
 
             if key == 'contents' and 'case-sensitive' not in sorting_params:
                 matchout = re.match(value, finkey, flags=re.DOTALL)
-            elif key == 'contents' and 'case-sensitive' in sorting_params:
-                matchout = re.match(value, finkey, flags=re.IGNORECASE | re.DOTALL)
             elif key != 'contents' and 'case-sensitive' in sorting_params:
                 matchout = re.match(value, finkey, flags=re.IGNORECASE)
+            elif key == 'contents' and 'case-sensitive' in sorting_params:
+                matchout = re.match(value, finkey, flags=re.IGNORECASE | re.DOTALL)
             else:
                 matchout = re.match(value, finkey)
             if value != '' and not matchout:
