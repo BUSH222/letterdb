@@ -65,12 +65,13 @@ def filter_data(data, filter_dict, sorting_params=[]):
             if 'replace-e' in sorting_params:
                 value = value.replace('ё', 'е')  # cyrillic
                 finkey = str(d.get(key)).replace('ё', 'е')
-            if 'case-sensitive' in sorting_params:
-                matchout = re.match(value, finkey, flags=re.IGNORECASE)
-            if key == 'contents':
+
+            if key == 'contents' and 'case-sensitive' not in sorting_params:
                 matchout = re.match(value, finkey, flags=re.DOTALL)
             elif key == 'contents' and 'case-sensitive' in sorting_params:
                 matchout = re.match(value, finkey, flags=re.IGNORECASE | re.DOTALL)
+            elif key != 'contents' and 'case-sensitive' in sorting_params:
+                matchout = re.match(value, finkey, flags=re.IGNORECASE)
             else:
                 matchout = re.match(value, finkey)
             if value != '' and not matchout:

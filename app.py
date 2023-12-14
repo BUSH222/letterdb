@@ -250,9 +250,13 @@ def search():
             elif s[0] in CHECKBOX_INPUT_FIELDS and s[1] == 'on':
                 checkbox_items_on.append(s[0])
         tempdata = filter_data(DATADICT, textfields, sorting_params=checkbox_items_on)
-        return render_template('search.html', data=tempdata, hidden=hidden)
+        if len(tempdata) != 0:
+            return render_template('search.html', data=tempdata, hidden=hidden, notfoundhidden='hidden')
+        else:
+            return render_template('search.html', data=tempdata, hidden=hidden, notfoundhidden='')
+
     else:
-        return render_template('search.html', data=DATADICT, hidden=hidden)
+        return render_template('search.html', data=DATADICT, hidden=hidden, notfoundhidden='hidden')
 
 
 if __name__ == '__main__':

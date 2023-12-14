@@ -64,6 +64,7 @@
 <div id="container_29ee7549"><div id="container_29ee7549_padding" ><div class="textstyle3"><span class="textstyle7">Поиск по писем В.А. Обручева</span><button onclick="location.href='/newletter'" style="{{hidden}};">New record</button><span class="textstyle8"><br/></span><ul id="ul_7b56f8c2" class="ulstyle1">
 <li><span class="textstyle8">Поиск по письмам можно осуществлять по разным параметрам и в текстах писем</span></li>
 <li><span class="textstyle8">Ниже представлен каталог писем, который можно сортировать по столбцам</span></li>
+<li><span class="textstyle8">Для быстрого поиска наберите *слово*</span></li>
 </ul>
 </ul>
   <span class="textstyle8"> <br/><br/></span>
@@ -129,6 +130,9 @@
 	{% endfor %}
 	</tbody>
 </table>
+<br><br>
+<h1 style="text-align:center" {{notfoundhidden}}>Не найдено</h1>
+<h2 style="text-align:center"{{notfoundhidden}}>(Попробуйте ввести *слово*)</h2>
 <script src="static/script_main.js"></script>
 </body>
 </html>
