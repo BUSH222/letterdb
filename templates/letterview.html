@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html> 
+<html>
+
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,78 +8,142 @@
 	<title></title>
 	<link rel="stylesheet" type="text/css" href="/static/letterview_html.css">
 </head>
+
 <body>
-<div class="textstyle1">
-<span class="textstyle2"></span>  </div>
-<div class="textstyle3">
-<div id="container_1809c9fc"><div id="container_1809c9fc_padding" ><div class="textstyle3">  <span class="textstyle4"><br/></span>
-	<span class="textstyle4"><a href="/">Информационная система ГИН РАН</a></span><span class="textstyle2"><br/></span>
-<h1 id="heading_60dba8b2">Письмо В.А. Обручева</h1></div>
-<div style="clear:both"></div></div></div><div id="container_274cbdb6"><div id="container_274cbdb6_padding" ><div class="textstyle3">  <div id="menu_526a9cdd">
-    <div  class="menuholder1"><a href="javascript:void(0);">
-	<div id="menuentry_5ad1743c"  class="menustyle1 menu_526a9cdd_mainMenuEntry mobileEntry">
-		<div class="menuentry_text1">
-      <span class="textstyle5">Menu ▼</span>
+	<div class="textstyle1">
+		<span class="textstyle2"></span>
+	</div>
+	<div class="textstyle3">
+		<div id="container_1809c9fc">
+			<div id="container_1809c9fc_padding">
+				<div class="textstyle3"> <span class="textstyle4"><br /></span>
+					<span class="textstyle4"><a href="/">Информационная система ГИН РАН</a></span><span
+						class="textstyle2"><br /></span>
+					<h1 id="heading_60dba8b2">Письмо В.А. Обручева</h1>
+				</div>
+				<div style="clear:both"></div>
+			</div>
+		</div>
+		<div id="container_274cbdb6">
+			<div id="container_274cbdb6_padding">
+				<div class="textstyle3">
+					<div id="menu_526a9cdd">
+						<div class="menuholder1"><a href="javascript:void(0);">
+								<div id="menuentry_5ad1743c" class="menustyle1 menu_526a9cdd_mainMenuEntry mobileEntry">
+									<div class="menuentry_text1">
+										<span class="textstyle5">Menu ▼</span>
+									</div>
+								</div>
+							</a>
+							<a href="/search" style="text-decoration:none">
+								<div id="menuentry_24b03f36" class="menustyle1 menu_526a9cdd_mainMenuEntry normalEntry">
+									<div class="menuentry_text2">
+										<span class="textstyle6">Поиск</span>
+									</div>
+								</div>
+							</a>
+							<a href="/" style="text-decoration:none">
+								<div id="menuentry_5d96740" class="menustyle2 menu_526a9cdd_mainMenuEntry normalEntry">
+									<div class="menuentry_text2">
+										<span class="textstyle6">ИС</span>
+									</div>
+								</div>
+							</a>
+							<a href="/about" style="text-decoration:none">
+								<div id="menuentry_7cc28000" class="menustyle3 menu_526a9cdd_mainMenuEntry normalEntry">
+									<div class="menuentry_text2">
+										<span class="textstyle6">О письмах</span>
+									</div>
+								</div>
+							</a>
+
+							<script type="text/javascript" src="/rc_images/wsp_menu.js"></script>
+							<script type="text/javascript">
+								var js_menu_526a9cdd = new wsp_menu('menu_526a9cdd', 'menu_526a9cdd', 10, null, true);
+
+								js_menu_526a9cdd.createMenuForItem('menuentry_5ad1743c', ["      <span class=\"textstyle7\">Поиск</span> ", 'search.htm', '',
+									"      <span class=\"textstyle7\">Каталог</span> ", 'about.html', '',
+									"      <span class=\"textstyle7\">О письмах</span> ", 'about.html', '']);
+								js_menu_526a9cdd.createMenuForItem('menuentry_24b03f36', []);
+								js_menu_526a9cdd.createMenuForItem('menuentry_5d96740', []);
+								js_menu_526a9cdd.createMenuForItem('menuentry_7cc28000', []);
+
+							</script>
+						</div>
+					</div>
+				</div>
+
+				<div style="clear:both"></div>
+			</div>
+		</div>
+		<div id="container_6036d6">
+			<div id="container_6036d6_padding">
+				<div class="textstyle3"><span class="textstyle8"><button
+							onclick="location.href='/edit/{{data.catalogue}}'" {{ hidden }}>Edit</button><br />Письмо {{
+						data.addressee }}</span><span class="textstyle9"><br /></span><span class="textstyle10">
+						{{ data.date }}<br /></span></div>
+				<div class="textstyle1"><span class="textstyle11"><br /></span></div>
+			</div>
+		</div><span class="textstyle2"><br /></span>
+		
+		<div id="container_36175d75">
+			<br><br>
+			<div class="textstyle3"><span class="textstyle10"><h2>Текст Письма</h2><br /><br /></span>
+				<div id="container_17c6ed17">
+					
+					<div id="container_17c6ed17_padding">
+						<div class="textstyle1" style="white-space: pre-wrap;"> {{ data.contents_txt }} </div>
+					</div>
+				</div><span class="textstyle10"><br /></span><span class="textstyle12"><br /><br /></span>
+			</div>
+		</div><span class="textstyle2"><br /></span>
+		
+		<div id="container_36175d75">
+			
+			<div class="textstyle3"><span class="textstyle10"><h2>Комментарии получателя письма</h2><br /><br /></span>
+				<div id="container_17c6ed17">
+					<div id="container_17c6ed17_padding">
+						<div class="textstyle1" style="white-space: pre-wrap;"> {{ data.comments }} </div>
+					</div>
+				</div><span class="textstyle10"><br /></span><span class="textstyle12"><br /><br /></span>
+			</div>
+		</div><span class="textstyle2"><br /></span>
+		
+		<div id="container_36175d75">
+			
+			<div class="textstyle3"><span class="textstyle10"><h2> Примечания составителей</h2><br /><br /></span>
+				<div id="container_17c6ed17">
+					<div id="container_17c6ed17_padding">
+						<div class="textstyle1" style="white-space: pre-wrap;"> {{ data.notes }} </div>
+					</div>
+				</div><span class="textstyle10"><br /></span><span class="textstyle12"><br /><br /></span>
+			</div>
+		</div><span class="textstyle2"><br /></span>
+		<div id="container_7a6e5f84">
+			<div class="textstyle3"><span class="textstyle10"><br /><br /></span>
+				<div id="container_75690335">
+					<div id="container_75690335_padding">
+						<div class="textstyle1"><span class="textstyle13">Опубликован {{ data.published }}</span>
+							<ul id="ul_1287e519" class="ulstyle1">
+								<li><span class="textstyle13">Ключевые слова: {{ data.keywords }}</span></li>
+								<li><span class="textstyle13">Регион: {{ data.regions }}</span></li>
+							</ul>
+							<span class="textstyle13"> <br /></span>
+						</div>
+
+						<div style="clear:both"></div>
+					</div>
+				</div><span class="textstyle10"><br /></span><span class="textstyle12"><br /></span>
+			</div>
 		</div>
 	</div>
-</a>
-<a href="/search" style="text-decoration:none">
-	<div id="menuentry_24b03f36"  class="menustyle1 menu_526a9cdd_mainMenuEntry normalEntry">
-		<div class="menuentry_text2">
-      <span class="textstyle6">Поиск</span>
-		</div>
+	<br><br>
+	<div style="text-align: center;" class="textstyle4">
+		<br>
+		<h1>Скан письма</h1>
+		<br>
+		{{data.imagelink|safe}}
 	</div>
-</a>
-<a href="/" style="text-decoration:none">
-	<div id="menuentry_5d96740"  class="menustyle2 menu_526a9cdd_mainMenuEntry normalEntry">
-		<div class="menuentry_text2">
-      <span class="textstyle6">ИС</span>
-		</div>
-	</div>
-</a>
-<a href="/about" style="text-decoration:none">
-	<div id="menuentry_7cc28000"  class="menustyle3 menu_526a9cdd_mainMenuEntry normalEntry">
-		<div class="menuentry_text2">
-      <span class="textstyle6">О письмах</span>
-		</div>
-	</div>
-</a>
-
-	<script type="text/javascript" src="/rc_images/wsp_menu.js"></script>
-	<script type="text/javascript">
-		var js_menu_526a9cdd= new wsp_menu('menu_526a9cdd', 'menu_526a9cdd', 10, null, true);
-
-		js_menu_526a9cdd.createMenuForItem('menuentry_5ad1743c', ["      <span class=\"textstyle7\">Поиск</span> ", 'search.htm', '',
-		                                   "      <span class=\"textstyle7\">Каталог</span> ", 'about.html', '',
-		                                   "      <span class=\"textstyle7\">О письмах</span> ", 'about.html', '']);
-		js_menu_526a9cdd.createMenuForItem('menuentry_24b03f36', []);
-		js_menu_526a9cdd.createMenuForItem('menuentry_5d96740', []);
-		js_menu_526a9cdd.createMenuForItem('menuentry_7cc28000', []);
-
-	</script>
-      </div>
-    </div>
-</div>
-
-<div style="clear:both"></div></div>
-</div><div id="container_6036d6"><div id="container_6036d6_padding" ><div class="textstyle3"><span class="textstyle8"><button onclick="location.href='/edit/{{data.catalogue}}'" {{ hidden }}>Edit</button><br/>Письмо {{ data.addressee }}</span><span class="textstyle9"><br/></span><span class="textstyle10">Письмо № {{ data.catalogue }}<br/></span></div>
-<div class="textstyle1"><span class="textstyle11"><br/></span></div>
-</div></div><span class="textstyle2"><br/></span><div id="container_36175d75"><div class="textstyle3"><span class="textstyle10"><br/><br/></span><div id="container_17c6ed17"><div id="container_17c6ed17_padding" ><div class="textstyle1" style="white-space: pre-wrap;"> {{ data.contents_txt }} </div>
-</div></div><span class="textstyle10"><br/></span><span class="textstyle12"><br/><br/></span></div>
-</div><span class="textstyle2"><br/></span><div id="container_7a6e5f84"><div class="textstyle3"><span class="textstyle10"><br/><br/></span><div id="container_75690335"><div id="container_75690335_padding" ><div class="textstyle1"><span class="textstyle13">Опубликован {{ data.published }}</span><ul id="ul_1287e519" class="ulstyle1">
-<li><span class="textstyle13">Ключевые слова: {{ data.keywords }}</span></li>
-<li><span class="textstyle13">Регион: {{ data.regions }}</span></li>
-</ul>
-<span class="textstyle13"> <br/></span></div>
-
-<div style="clear:both"></div></div></div><span class="textstyle10"><br/></span><span class="textstyle12"><br/></span></div>
-</div> </div>
-<br><br>
-<div style="text-align: center;" class="textstyle4">
-<br>
-<h1>Скан письма</h1>
-<br>
-{{data.imagelink|safe}} 
-</div>
 </body>
+
 </html>

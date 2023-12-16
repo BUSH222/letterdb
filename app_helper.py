@@ -15,7 +15,7 @@ DOC_REL_DIR = 'documents'
 TEXT_INPUT_FIELDS = ['catalogue', 'date', 'addressee', 'keywords', 'regions', 'contents']
 CHECKBOX_INPUT_FIELDS = ['case-sensitive', 'use-regex', 'replace-e', 'published']
 DATA_FIELDS = ['catalogue', 'date', 'addressee', 'keywords', 'regions',
-               'contents_txt', 'filename', 'imagelink', 'published']
+               'contents_txt', 'filename', 'imagelink', 'published', 'comments', 'notes']
 
 GOOGLE_CLIENT_SECRET = environ.get("GOOGLE_CLIENT_SECRET", None)
 GOOGLE_CLIENT_ID = environ.get("GOOGLE_CLIENT_ID", None)
@@ -99,7 +99,9 @@ def create_table(force=False):
                 contents_txt,
                 filename,
                 imagelink,
-                published DEFAULT 0
+                published DEFAULT 0,
+                comments,
+                notes
                 )""")
 
 
@@ -141,7 +143,9 @@ regions = '{row["regions"]}',
 contents_txt = '{row["contents_txt"]}',
 filename = '{row["filename"]}',
 imagelink = '{row["imagelink"]}',
-published = '{row["published"]}'
+published = '{row["published"]}',
+comments = '{row["comments"]}',
+notes = '{row["notes"]}'
 WHERE catalogue = '{number}';"""
     cur.execute(query)
     con.commit()
@@ -150,9 +154,9 @@ WHERE catalogue = '{number}';"""
 def add_row(values):
     """Adds another row to the database."""
     cur.execute("INSERT INTO letterdb "
-                "(catalogue, date, adressee, keywords, regions,"
-                "contents_txt, filename, imagelink, published)"
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", tuple(values))
+                "(catalogue, date, adressee, keywords, regions, contents_txt,"
+                "filename, imagelink, published, comments, notes)"
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", tuple(values))
     con.commit()
 
 

@@ -237,9 +237,7 @@ def finalise_edit(itemindex):
 @app.route('/search', methods=['POST', 'GET'])
 def search():
     """Return the search values."""
-    hidden = 'display:none'
-    if current_user.is_authenticated:
-        hidden = ''
+    hidden = 'hidden'
     if request.method == 'POST':
         query = dict(request.form)
         textfields = {}
@@ -251,12 +249,12 @@ def search():
                 checkbox_items_on.append(s[0])
         tempdata = filter_data(DATADICT, textfields, sorting_params=checkbox_items_on)
         if len(tempdata) != 0:
-            return render_template('search.html', data=tempdata, hidden=hidden, notfoundhidden='hidden')
+            return render_template('search.html', data=tempdata, hidden=hidden)
         else:
-            return render_template('search.html', data=tempdata, hidden=hidden, notfoundhidden='')
+            return render_template('search.html', data=tempdata, hidden=hidden)
 
     else:
-        return render_template('search.html', data=DATADICT, hidden=hidden, notfoundhidden='hidden')
+        return render_template('search.html', data=DATADICT, hidden=hidden)
 
 
 if __name__ == '__main__':
