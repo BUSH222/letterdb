@@ -17,8 +17,7 @@
 		<div id="container_1809c9fc">
 			<div id="container_1809c9fc_padding">
 				<div class="textstyle3"> <span class="textstyle4"><br /></span>
-					<span class="textstyle4"><a href="/">Информационная система ГИН РАН</a></span><span
-						class="textstyle2"><br /></span>
+					<br>
 					<h1 id="heading_60dba8b2">Письмо В.А. Обручева</h1>
 				</div>
 				<div style="clear:both"></div>
@@ -88,7 +87,7 @@
 		
 		<div id="container_36175d75">
 			<br><br>
-			<div class="textstyle3"><span class="textstyle10"><h2>Текст Письма</h2><br /><br /></span>
+			<div class="textstyle3"><span class="textstyle10"><h2>Текст Письма</h2><br /></span>
 				<div id="container_17c6ed17">
 					
 					<div id="container_17c6ed17_padding">
@@ -100,7 +99,7 @@
 		
 		<div id="container_36175d75">
 			
-			<div class="textstyle3"><span class="textstyle10"><h2>Комментарии получателя письма</h2><br /><br /></span>
+			<div class="textstyle3"><span class="textstyle10"><h2>Комментарии получателя письма</h2><br /></span>
 				<div id="container_17c6ed17">
 					<div id="container_17c6ed17_padding">
 						<div class="textstyle1" style="white-space: pre-wrap;"> {{ data.comments }} </div>
@@ -111,22 +110,25 @@
 		
 		<div id="container_36175d75">
 			
-			<div class="textstyle3"><span class="textstyle10"><h2> Примечания составителей</h2><br /><br /></span>
+			<div class="textstyle3"><span class="textstyle10"><h2> Примечания составителей</h2><br /></span>
 				<div id="container_17c6ed17">
 					<div id="container_17c6ed17_padding">
 						<div class="textstyle1" style="white-space: pre-wrap;"> {{ data.notes | safe}} </div>
 					</div>
-				</div><span class="textstyle10"><br /></span><span class="textstyle12"><br /><br /></span>
+				</div><span class="textstyle10"><br /></span><span class="textstyle12"><br /></span>
 			</div>
 		</div><span class="textstyle2"><br /></span>
 		<div id="container_7a6e5f84">
 			<div class="textstyle3"><span class="textstyle10"><br /><br /></span>
 				<div id="container_75690335">
 					<div id="container_75690335_padding">
-						<div class="textstyle1"><span class="textstyle13">Опубликован {{ data.published }}</span>
+						<div class="textstyle1">
 							<ul id="ul_1287e519" class="ulstyle1">
-								<li><span class="textstyle13">Ключевые слова: {{ data.keywords }}</span></li>
-								<li><span class="textstyle13">Регион: {{ data.regions }}</span></li>
+								<li><span class="textstyle13"><b>Опубликован:</b> {{ data.published }}</span></li>
+								<br>
+								<li><span class="textstyle13"><b>Ключевые слова:</b> {{ data.keywords }}</span></li>
+								<br>
+								<li><span class="textstyle13"><b>Регион:</b> {{ data.regions }}</span></li>
 							</ul>
 							<span class="textstyle13"> <br /></span>
 						</div>
