@@ -10,6 +10,7 @@
 # secret keys and user data
 .env
 sqlite_db
+maindb.db
 
 # ignored folders
 doc-testfin/
