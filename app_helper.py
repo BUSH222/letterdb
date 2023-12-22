@@ -2,11 +2,17 @@ from os import environ
 import sqlite3
 import glob
 import re
-from dotenv import load_dotenv
+from dotenv import load_dotenv, set_key, find_dotenv
 import requests
 import json
+import argparse
 
-load_dotenv()  # load secret keys
+dotenv_file = find_dotenv()
+if not dotenv_file:
+    f = open('.env', 'x')
+    f.close()
+    dotenv_file = find_dotenv()
+load_dotenv(dotenv_file)  # load secret keys
 
 DB_FILE = 'maindb.db'
 DOC_TXT_REL_DIR = 'documents-txt'
@@ -23,11 +29,10 @@ GOOGLE_DISCOVERY_URL = (
     "https://accounts.google.com/.well-known/openid-configuration"
 )
 
-APPROVED_EMAILS = json.loads(environ.get("APPROVED_EMAILS", None))
+APPROVED_EMAILS = json.loads(environ.get("APPROVED_EMAILS", '[]'))
 
 con = sqlite3.connect(DB_FILE, check_same_thread=False)
 cur = con.cursor()
-print('Dependencies loaded.')
 
 
 def get_google_provider_cfg():
@@ -103,6 +108,34 @@ def create_table(force=False):
                 comments,
                 notes
                 )""")
+
+
+def clear_table():
+    """Clear a table without closing the connection."""
+    cur.execute("DELETE * FROM letterdb")
+
+
+def envedit(envvars, emaildata):
+    """Edit the environment variables."""
+    for key, value in envvars.items():
+        environ[key] = value
+        set_key(dotenv_file, key, environ[key])
+    for key, value in emaildata.items():
+        if key == 'ADD':
+            td = json.loads(environ["APPROVED_EMAILS"])
+            td.append(value)
+            environ["APPROVED_EMAILS"] = json.dumps(td)
+            set_key(dotenv_file, "APPROVED_EMAILS", environ["APPROVED_EMAILS"])
+        if key == 'REMOVE':
+            td = json.loads(environ["APPROVED_EMAILS"])
+            if value not in td:
+                raise argparse.ArgumentError(message="The email specified is not in the stored emails.")
+            td.remove(value)
+            environ["APPROVED_EMAILS"] = json.dumps(td)
+            set_key(dotenv_file, "APPROVED_EMAILS", environ["APPROVED_EMAILS"])
+        if key == 'SET':
+            environ["APPROVED_EMAILS"] = json.dumps(value.split())
+            set_key(dotenv_file, "APPROVED_EMAILS", environ["APPROVED_EMAILS"])
 
 
 def load_data():
