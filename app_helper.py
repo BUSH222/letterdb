@@ -2,20 +2,26 @@ from os import environ
 import sqlite3
 import glob
 import re
-from dotenv import load_dotenv
+from dotenv import load_dotenv, set_key, find_dotenv
 import requests
 import json
+import argparse
 
-load_dotenv()  # load secret keys
+dotenv_file = find_dotenv()
+if not dotenv_file:
+    f = open('.env', 'x')
+    f.close()
+    dotenv_file = find_dotenv()
+load_dotenv(dotenv_file)  # load secret keys
 
 DB_FILE = 'maindb.db'
 DOC_TXT_REL_DIR = 'documents-txt'
 DOC_REL_DIR = 'documents'
 
-TEXT_INPUT_FIELDS = ['catalogue', 'date', 'addressee', 'keywords', 'regions']
+TEXT_INPUT_FIELDS = ['catalogue', 'date', 'addressee', 'keywords', 'regions', 'contents']
 CHECKBOX_INPUT_FIELDS = ['case-sensitive', 'use-regex', 'replace-e', 'published']
 DATA_FIELDS = ['catalogue', 'date', 'addressee', 'keywords', 'regions',
-               'contents_txt', 'filename', 'imagelink', 'published']
+               'contents_txt', 'filename', 'imagelink', 'published', 'comments', 'notes']
 
 GOOGLE_CLIENT_SECRET = environ.get("GOOGLE_CLIENT_SECRET", None)
 GOOGLE_CLIENT_ID = environ.get("GOOGLE_CLIENT_ID", None)
@@ -23,11 +29,10 @@ GOOGLE_DISCOVERY_URL = (
     "https://accounts.google.com/.well-known/openid-configuration"
 )
 
-APPROVED_EMAILS = json.loads(environ.get("APPROVED_EMAILS", None))
+APPROVED_EMAILS = json.loads(environ.get("APPROVED_EMAILS", '[]'))
 
 con = sqlite3.connect(DB_FILE, check_same_thread=False)
 cur = con.cursor()
-print('Dependencies loaded.')
 
 
 def get_google_provider_cfg():
@@ -60,15 +65,19 @@ def filter_data(data, filter_dict, sorting_params=[]):
         match = True
         for key, value in filter_dict.items():
             finkey = str(d.get(key))
+            if key == 'contents':
+                finkey = str(d.get('contents_txt'))
+
             if 'use-regex' not in sorting_params:
                 value = value.replace('*', '.*')
             if 'replace-e' in sorting_params:
                 value = value.replace('ё', 'е')  # cyrillic
-                finkey = str(d.get(key)).replace('ё', 'е')
-            if 'case-sensitive' in sorting_params:
-                matchout = re.match(value, finkey, flags=re.IGNORECASE)
-            if key == 'contents':
+                finkey = finkey.replace('ё', 'е')
+
+            if key == 'contents' and 'case-sensitive' not in sorting_params:
                 matchout = re.match(value, finkey, flags=re.DOTALL)
+            elif key != 'contents' and 'case-sensitive' in sorting_params:
+                matchout = re.match(value, finkey, flags=re.IGNORECASE)
             elif key == 'contents' and 'case-sensitive' in sorting_params:
                 matchout = re.match(value, finkey, flags=re.IGNORECASE | re.DOTALL)
             else:
@@ -95,8 +104,38 @@ def create_table(force=False):
                 contents_txt,
                 filename,
                 imagelink,
-                published DEFAULT 0
+                published DEFAULT 0,
+                comments,
+                notes
                 )""")
+
+
+def clear_table():
+    """Clear a table without closing the connection."""
+    cur.execute("DELETE * FROM letterdb")
+
+
+def envedit(envvars, emaildata):
+    """Edit the environment variables."""
+    for key, value in envvars.items():
+        environ[key] = value
+        set_key(dotenv_file, key, environ[key])
+    for key, value in emaildata.items():
+        if key == 'ADD':
+            td = json.loads(environ["APPROVED_EMAILS"])
+            td.append(value)
+            environ["APPROVED_EMAILS"] = json.dumps(td)
+            set_key(dotenv_file, "APPROVED_EMAILS", environ["APPROVED_EMAILS"])
+        if key == 'REMOVE':
+            td = json.loads(environ["APPROVED_EMAILS"])
+            if value not in td:
+                raise argparse.ArgumentError(message="The email specified is not in the stored emails.")
+            td.remove(value)
+            environ["APPROVED_EMAILS"] = json.dumps(td)
+            set_key(dotenv_file, "APPROVED_EMAILS", environ["APPROVED_EMAILS"])
+        if key == 'SET':
+            environ["APPROVED_EMAILS"] = json.dumps(value.split())
+            set_key(dotenv_file, "APPROVED_EMAILS", environ["APPROVED_EMAILS"])
 
 
 def load_data():
@@ -128,27 +167,33 @@ def load_data():
 def update_row(row, number):
     """Updates the row in the database."""
     global cur, con
-    query = f"""UPDATE letterdb
-SET catalogue = '{row["catalogue"]}',
-date = '{row["date"]}',
-adressee = '{row["addressee"]}',
-keywords = '{row["keywords"]}',
-regions = '{row["regions"]}',
-contents_txt = '{row["contents_txt"]}',
-filename = '{row["filename"]}',
-imagelink = '{row["imagelink"]}',
-published = '{row["published"]}'
-WHERE catalogue = '{number}';"""
-    cur.execute(query)
+    rowdata = (row["catalogue"], row["date"], row["addressee"],
+               row["keywords"], row["regions"], row["contents_txt"],
+               row["filename"], row["imagelink"], row["published"],
+               row["comments"], row["notes"], number)
+    query = """UPDATE letterdb
+SET catalogue = ?,
+date = ?',
+adressee = ?,
+keywords = ?,
+regions = ?,
+contents_txt = ?,
+filename = ?,
+imagelink = ?,
+published = ?,
+comments = ?,
+notes = ?
+WHERE catalogue = ?;"""
+    cur.execute(query, rowdata)
     con.commit()
 
 
 def add_row(values):
     """Adds another row to the database."""
     cur.execute("INSERT INTO letterdb "
-                "(catalogue, date, adressee, keywords, regions,"
-                "contents_txt, filename, imagelink, published)"
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", tuple(values))
+                "(catalogue, date, adressee, keywords, regions, contents_txt,"
+                "filename, imagelink, published, comments, notes)"
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", tuple(values))
     con.commit()
 
 
