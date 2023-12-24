@@ -167,20 +167,24 @@ def load_data():
 def update_row(row, number):
     """Updates the row in the database."""
     global cur, con
+    rowdata = (row["catalogue"], row["date"], row["addressee"],
+               row["keywords"], row["regions"], row["contents_txt"],
+               row["filename"], row["imagelink"], row["published"],
+               row["comments"], row["notes"], number)
     query = f"""UPDATE letterdb
-SET catalogue = '{row["catalogue"]}',
-date = '{row["date"]}',
-adressee = '{row["addressee"]}',
-keywords = '{row["keywords"]}',
-regions = '{row["regions"]}',
-contents_txt = '{row["contents_txt"]}',
-filename = '{row["filename"]}',
-imagelink = '{row["imagelink"]}',
-published = '{row["published"]}',
-comments = '{row["comments"]}',
-notes = '{row["notes"]}'
-WHERE catalogue = '{number}';"""
-    cur.execute(query)
+SET catalogue = ?,
+date = ?',
+adressee = ?,
+keywords = ?,
+regions = ?,
+contents_txt = ?,
+filename = ?,
+imagelink = ?,
+published = ?,
+comments = ?,
+notes = ?
+WHERE catalogue = ?;"""
+    cur.execute(query, rowdata)
     con.commit()
 
 
