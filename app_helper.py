@@ -171,7 +171,7 @@ def update_row(row, number):
                row["keywords"], row["regions"], row["contents_txt"],
                row["filename"], row["imagelink"], row["published"],
                row["comments"], row["notes"], number)
-    query = f"""UPDATE letterdb
+    query = """UPDATE letterdb
 SET catalogue = ?,
 date = ?',
 adressee = ?,
