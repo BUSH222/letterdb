@@ -77,9 +77,6 @@ def main():
             if os.path.isfile(os.path.join(bdir, oldest)):
                 os.remove(os.path.join(bdir, oldest))
         shutil.copy('maindb.db', os.path.join(bdir, f'maindb_{filename}.db '))
-            
-        
-
     else:
         parser.print_help()
     print('Done!')
