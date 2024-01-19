@@ -1,5 +1,8 @@
 import argparse
 import app_helper
+import os
+from datetime import datetime
+import shutil
 
 
 def main():
@@ -26,6 +29,9 @@ def main():
     group.add_argument('-add', '--add_email', type=str, help='Email address to add.')
     group.add_argument('-rm', '--remove_email', type=str, help='Email address to remove.')
     group.add_argument('-set', '--emails', type=str, help='List of emails')
+
+    backup_parser = subparsers.add_parser('backup', help='Create a backup of the database.')
+    backup_parser.add_argument('-dir', '--directory', type=str, help='Directory of the backup folder.')
 
     args = parser.parse_args()
 
@@ -61,6 +67,19 @@ def main():
         if args.emails:
             emailenvdata['SET'] = args.emails
         app_helper.envedit(envdata, emailenvdata)
+    elif args.command == 'backup':
+        bdir = args.directory
+        assert os.path.isdir(bdir)
+        filename = datetime.utcnow().strftime('%Y-%m-%d_%H:%M:%S')
+        backupcnt = len(os.listdir(bdir))
+        if backupcnt > 10:
+            oldest = sorted(os.listdir(bdir))[0]
+            if os.path.isfile(os.path.join(bdir, oldest)):
+                os.remove(os.path.join(bdir, oldest))
+        shutil.copy('maindb.db', os.path.join(bdir, f'maindb_{filename}.db '))
+            
+        
+
     else:
         parser.print_help()
     print('Done!')
