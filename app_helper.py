@@ -173,7 +173,7 @@ def update_row(row, number):
                row["comments"], row["notes"], number)
     query = """UPDATE letterdb
 SET catalogue = ?,
-date = ?',
+date = ?,
 adressee = ?,
 keywords = ?,
 regions = ?,
