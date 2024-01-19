@@ -13,11 +13,9 @@ function sortTable(n) {
         var aValue = a.cells[n].innerText || a.cells[n].textContent;
         var bValue = b.cells[n].innerText || b.cells[n].textContent;
 
-        if (isNumber.test(aValue) && isNumber.test(bValue)) {
-            return sortAscending ? aValue - bValue : bValue - aValue;
-        } else {
-            return sortAscending ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
-        }
+        
+        return sortAscending ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+
     });
 
     while (table.rows.length > 1) {
