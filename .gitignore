@@ -18,6 +18,7 @@ documents/
 documents-tempfix/
 documents-txt/
 misc-data
+maindb-backups/*
 
 # FUCK YOU
 .DS_Store
