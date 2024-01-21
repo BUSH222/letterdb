@@ -82,6 +82,12 @@ def contact():
     return render_template('contact.html')
 
 
+@app.route("/search_manual")
+def search_manual():
+    """Contact page."""
+    return render_template('search_manual.html')
+
+
 @app.route("/login")
 def login():
     """Begin the login sequence"""
