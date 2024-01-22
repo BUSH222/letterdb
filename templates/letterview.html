@@ -90,7 +90,7 @@
 				<div id="container_17c6ed17">
 					
 					<div id="container_17c6ed17_padding">
-						<div class="textstyle1" style="white-space: pre-wrap;"> {{ data.contents_txt }} </div>
+						<div class="textstyle1" style="white-space: pre-wrap;"> {{ data.contents_txt | safe}} </div>
 					</div>
 				</div><span class="textstyle10"><br /></span><span class="textstyle12"><br /><br /></span>
 			</div>
@@ -101,7 +101,7 @@
 			<div class="textstyle3"><span class="textstyle10"><h2>Комментарии получателя письма</h2><br /></span>
 				<div id="container_17c6ed17">
 					<div id="container_17c6ed17_padding">
-						<div class="textstyle1" style="white-space: pre-wrap;"> {{ data.comments | safe }} </div>
+						<div class="textstyle1" style="white-space: pre-wrap;"> {{ data.comments|safe }} </div>
 					</div>
 				</div><span class="textstyle10"><br /></span><span class="textstyle12"><br /><br /></span>
 			</div>
