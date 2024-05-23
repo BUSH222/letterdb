@@ -188,6 +188,13 @@ WHERE catalogue = ?;"""
     con.commit()
 
 
+def delete_row(number):
+    global cur, con
+    query = "DELETE FROM letterdb WHERE catalogue = ?;"
+    cur.execute(query, (number, ))
+    con.commit()
+
+
 def add_row(values):
     """Adds another row to the database."""
     cur.execute("INSERT INTO letterdb "

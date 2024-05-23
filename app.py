@@ -36,8 +36,8 @@ from app_helper import (
     get_google_provider_cfg,
     update_row,
     add_row,
+    delete_row,
 )
-
 
 app = Flask(__name__)
 
@@ -238,6 +238,24 @@ def finalise_edit(itemindex):
         cnt += 1
     update_row(dict(request.form), itemindex)
     return redirect(url_for('viewitem', itemindex=itemindex))
+
+
+@app.route('/delete/<string:itemindex>', methods=['GET'])
+def delete_letter(itemindex):
+    if not current_user.is_authenticated:
+        abort(403)
+    if current_user.email not in APPROVED_EMAILS:
+        abort(403)
+    if not itemindex.isdigit():
+        abort(400)
+    todel = None
+    for elem in DATADICT:
+        if elem['catalogue'] == itemindex:
+            todel = elem
+            break
+    DATADICT.remove(todel)
+    delete_row(itemindex)
+    return redirect(url_for('search'))
 
 
 @app.route('/search', methods=['POST', 'GET'])
