@@ -76,9 +76,11 @@
 		</div>
 		<div id="container_6036d6">
 			<div id="container_6036d6_padding">
-				<div class="textstyle3"><span class="textstyle8"><button
-							onclick="location.href='/edit/{{data.catalogue}}'" {{ hidden }}>Edit</button><br/>{{
-						data.addressee }}</span><span class="textstyle9"><br /></span><span class="textstyle10">
+				<div class="textstyle3"><span class="textstyle8">
+					<button onclick="location.href='/edit/{{data.catalogue}}'" {{ hidden }}>Edit</button>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<button onclick="location.href='/delete/{{data.catalogue}}'" {{ hidden }}>[DELETE]</button>
+					<br/>{{ data.addressee }}</span><span class="textstyle9"><br /></span><span class="textstyle10">
 						{{ data.date }}<br /></span></div>
 				<div class="textstyle1"><span class="textstyle11"><br /></span></div>
 			</div>
