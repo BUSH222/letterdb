@@ -141,7 +141,7 @@
 				<th onclick="sortTable(2)">Адресат</th>
 				<th>Ключевые слова</th>
 				<th>Регионы</th>
-				<th style="width:5%">Источник</th>
+				<th style="width:5%">Содержание</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -154,7 +154,7 @@
 				<td>{{item.addressee}}</td>
 				<td>{{item.keywords}}</td>
 				<td>{{item.regions}}</td>
-				<td><button onclick="location.href='viewitem/{{item.catalogue}}'">Посмотреть источник</button></td>
+				<td><button onclick="location.href='viewitem/{{item.catalogue}}'">Посмотреть содержание</button></td>
 			</tr>
 			{% endfor %}
 		</tbody>
