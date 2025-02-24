@@ -154,7 +154,7 @@
 				<td>{{item.addressee}}</td>
 				<td>{{item.keywords}}</td>
 				<td>{{item.regions}}</td>
-				<td><button onclick="location.href='viewitem/{{item.catalogue}}'">Посмотреть содержание</button></td>
+				<td><button onclick="window.open('viewitem/{{item.catalogue}}', '_blank')">Посмотреть содержание</button></td>
 			</tr>
 			{% endfor %}
 		</tbody>

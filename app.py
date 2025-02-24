@@ -171,7 +171,7 @@ def viewitem(itemindex):
 
     if current_user.is_authenticated and current_user.email in APPROVED_EMAILS:
         hidden = ""
-
+    print(current_letter_data)
     return render_template("letterview.html", data=current_letter_data, hidden=hidden)
 
 
