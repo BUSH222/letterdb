@@ -1,11 +1,7 @@
-import argparse
 import glob
-import json
 import re
 import sqlite3
-from os import environ
 
-import requests
 from dotenv import find_dotenv, load_dotenv, set_key
 
 dotenv_file = find_dotenv()
@@ -35,19 +31,8 @@ DATA_FIELDS = [
     "notes",
 ]
 
-GOOGLE_CLIENT_SECRET = environ.get("GOOGLE_CLIENT_SECRET", None)
-GOOGLE_CLIENT_ID = environ.get("GOOGLE_CLIENT_ID", None)
-GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
-
-APPROVED_EMAILS = json.loads(environ.get("APPROVED_EMAILS", "[]"))
-
 con = sqlite3.connect(DB_FILE, check_same_thread=False)
 cur = con.cursor()
-
-
-def get_google_provider_cfg():
-    """Return the google provider config in a json format."""
-    return requests.get(GOOGLE_DISCOVERY_URL).json()
 
 
 def unload_data():
@@ -123,29 +108,6 @@ def create_table(force=False):
 def clear_table():
     """Clear a table without closing the connection."""
     cur.execute("DELETE * FROM letterdb")
-
-
-def envedit(envvars, emaildata):
-    """Edit the environment variables."""
-    for key, value in envvars.items():
-        environ[key] = value
-        set_key(dotenv_file, key, environ[key])
-    for key, value in emaildata.items():
-        if key == "ADD":
-            td = json.loads(environ["APPROVED_EMAILS"])
-            td.append(value)
-            environ["APPROVED_EMAILS"] = json.dumps(td)
-            set_key(dotenv_file, "APPROVED_EMAILS", environ["APPROVED_EMAILS"])
-        if key == "REMOVE":
-            td = json.loads(environ["APPROVED_EMAILS"])
-            if value not in td:
-                raise argparse.ArgumentError(message="The email specified is not in the stored emails.")
-            td.remove(value)
-            environ["APPROVED_EMAILS"] = json.dumps(td)
-            set_key(dotenv_file, "APPROVED_EMAILS", environ["APPROVED_EMAILS"])
-        if key == "SET":
-            environ["APPROVED_EMAILS"] = json.dumps(value.split())
-            set_key(dotenv_file, "APPROVED_EMAILS", environ["APPROVED_EMAILS"])
 
 
 def load_data():
@@ -232,3 +194,8 @@ def add_row(values):
 def close_conn():
     """Close the connection."""
     con.close()
+
+
+def set_env_value(key, value):
+    """Store a value in the .env file."""
+    set_key(dotenv_file, key, value)

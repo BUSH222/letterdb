@@ -1,9 +1,20 @@
 import argparse
+import getpass
 import os
+import secrets
 import shutil
 from datetime import datetime
 
 import app_helper
+from user import User
+
+
+def prompt_password():
+    """Ask for a password twice without echoing it."""
+    password = getpass.getpass("Password: ")
+    if password != getpass.getpass("Repeat password: "):
+        raise SystemExit("The passwords do not match.")
+    return password
 
 
 def main():
@@ -19,22 +30,39 @@ def main():
     subparsers.add_parser("close", help="Close a database.")
 
     quick_setup_parser = subparsers.add_parser("quick_setup", help="Quick setup")
-    quick_setup_parser.add_argument("-s", "--secret", type=str, help="Client secret.", required=True)
-    quick_setup_parser.add_argument("-id", "--id", type=str, help="Client ID.", required=True)
-    quick_setup_parser.add_argument("-set", "--emails", type=str, help="List of emails", required=True)
+    quick_setup_parser.add_argument("-e", "--email", type=str, help="Email of the first user.", required=True)
+    quick_setup_parser.add_argument("-p", "--password", type=str, help="Password (prompted for if omitted).")
 
-    envedit_parser = subparsers.add_parser("envedit", help="Edit environment variables.")
-    envedit_parser.add_argument("-s", "--secret", type=str, help="Client secret.")
-    envedit_parser.add_argument("-id", "--id", type=str, help="Client ID.")
-    group = envedit_parser.add_mutually_exclusive_group()
-    group.add_argument("-add", "--add_email", type=str, help="Email address to add.")
-    group.add_argument("-rm", "--remove_email", type=str, help="Email address to remove.")
-    group.add_argument("-set", "--emails", type=str, help="List of emails")
+    user_add_parser = subparsers.add_parser("user_add", help="Create a user.")
+    user_add_parser.add_argument("email", type=str, help="Email of the user.")
+    user_add_parser.add_argument("-p", "--password", type=str, help="Password (prompted for if omitted).")
+
+    user_edit_parser = subparsers.add_parser("user_edit", help="Edit a user.")
+    user_edit_parser.add_argument("email", type=str, help="Current email of the user.")
+    user_edit_parser.add_argument("-e", "--new_email", type=str, help="New email.")
+    user_edit_parser.add_argument(
+        "-p", "--password", nargs="?", const="", help="New password (prompted for if empty)."
+    )
+
+    user_delete_parser = subparsers.add_parser("user_delete", help="Delete a user.")
+    user_delete_parser.add_argument("email", type=str, help="Email of the user.")
+
+    subparsers.add_parser("user_list", help="List all users.")
 
     backup_parser = subparsers.add_parser("backup", help="Create a backup of the database.")
     backup_parser.add_argument("-dir", "--directory", type=str, help="Directory of the backup folder.")
 
     args = parser.parse_args()
+
+    try:
+        run(args, parser)
+    except ValueError as e:
+        raise SystemExit(f"Error: {e}") from e
+    print("Done!")
+
+
+def run(args, parser):
+    """Run the chosen command."""
 
     if args.command == "new":
         app_helper.create_table(args.force)
@@ -48,26 +76,23 @@ def main():
         # Initialise and load the database
         app_helper.create_table(force=True)
         app_helper.load_data()
-        envdata = {}
-        emailenvdata = {}
-        envdata["GOOGLE_CLIENT_SECRET"] = args.secret
-        envdata["GOOGLE_CLIENT_ID"] = args.id
-        emailenvdata["SET"] = args.emails
-        app_helper.envedit(envdata, emailenvdata)
-    elif args.command == "envedit":
-        envdata = {}
-        emailenvdata = {}
-        if args.secret:
-            envdata["GOOGLE_CLIENT_SECRET"] = args.secret
-        if args.id:
-            envdata["GOOGLE_CLIENT_ID"] = args.id
-        if args.add_email:
-            emailenvdata["ADD"] = args.add_email
-        if args.remove_email:
-            emailenvdata["REMOVE"] = args.remove_email
-        if args.emails:
-            emailenvdata["SET"] = args.emails
-        app_helper.envedit(envdata, emailenvdata)
+        if not os.environ.get("SECRET_KEY"):
+            app_helper.set_env_value("SECRET_KEY", secrets.token_hex(32))
+        User.create(args.email, args.password or prompt_password())
+    elif args.command == "user_add":
+        User.create(args.email, args.password or prompt_password())
+    elif args.command == "user_edit":
+        if args.new_email is None and args.password is None:
+            parser.error("user_edit needs --new_email and/or --password.")
+        new_password = None
+        if args.password is not None:
+            new_password = args.password or prompt_password()
+        User.update(args.email, new_email=args.new_email, new_password=new_password)
+    elif args.command == "user_delete":
+        User.delete(args.email)
+    elif args.command == "user_list":
+        for user in User.all():
+            print(f"{user.id}\t{user.email}")
     elif args.command == "backup":
         bdir = args.directory
         assert os.path.isdir(bdir)
@@ -80,7 +105,6 @@ def main():
         shutil.copy("maindb.db", os.path.join(bdir, f"maindb_{filename}.db "))
     else:
         parser.print_help()
-    print("Done!")
 
 
 if __name__ == "__main__":

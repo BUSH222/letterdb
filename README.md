@@ -10,14 +10,20 @@ This repository contains the source code for LetterDB, a web application that al
 3) (Development) Run `uv run pre-commit install` to enable the ruff and ty hooks.
 4) Use the built in `manager` tool to quickly set everything up:
     - open terminal and cd to the directory of the project
-    - run `uv run manager.py quick_setup --secret=<your_google_client_secret> --id=<your_google_client_id> --emails=<space_separated_list_of_approved_emails>`
+    - run `uv run manager.py quick_setup --email=<email>` (you will be prompted for a password; `--password` is also accepted)
 
-    Replace `<your_google_client_secret>` and `<your_google_client_id>` with your Google API credentials. You can obtain these credentials from [the google API dashboard](https://console.cloud.google.com/apis/dashboard).
-
-    The list of approved emails should look like this:
-    `"example1@domain.com example2@domain.com example3@domain.com"`
+    This creates the letter database, a `SECRET_KEY` in `.env`, and the first user.
 5) Run the application using `uv run app.py`. \
 Please do note that this will run with an unsigned certificate. Proper hosting is required for release.
+
+## Users
+Users log in at `/login` with an email and password (stored hashed in `maindb.db`). Manage them with:
+- `uv run manager.py user_add <email> [-p <password>]`
+- `uv run manager.py user_edit <email> [-e <new_email>] [-p [<new_password>]]`
+- `uv run manager.py user_delete <email>`
+- `uv run manager.py user_list`
+
+If the password is omitted it is prompted for.
 
 ## Development
 Linting and formatting use `ruff`, type checking uses `ty`; both run in pre-commit and in the CI workflow.

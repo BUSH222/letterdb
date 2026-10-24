@@ -1,9 +1,5 @@
-import contextlib
-import json
 import os
-import sqlite3
 
-import requests
 from flask import (
     Flask,
     abort,
@@ -21,24 +17,18 @@ from flask_login import (
     login_user,
     logout_user,
 )
-from oauthlib.oauth2 import WebApplicationClient
 
 from app_helper import (
-    APPROVED_EMAILS,
     CHECKBOX_INPUT_FIELDS,
-    GOOGLE_CLIENT_ID,
-    GOOGLE_CLIENT_SECRET,
     TEXT_INPUT_FIELDS,
     add_row,
     delete_row,
     filter_data,
-    get_google_provider_cfg,
     unload_data,
     update_row,
 )
 
 # Internal imports
-from db import init_db_command
 from user import User
 
 app = Flask(__name__)
@@ -46,16 +36,11 @@ app = Flask(__name__)
 # Load data at start
 DATADICT = unload_data()
 
-# Google things
+# Login management
 app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(24)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-
-with contextlib.suppress(sqlite3.OperationalError):
-    init_db_command()
-
-client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
 
 @login_manager.user_loader
@@ -88,59 +73,17 @@ def search_manual():
     return render_template("search_manual.html")
 
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    """Begin the login sequence"""
-    google_provider_cfg = get_google_provider_cfg()
-    authorization_endpoint = google_provider_cfg["authorization_endpoint"]
-    request_uri = client.prepare_request_uri(
-        authorization_endpoint,
-        redirect_uri=request.base_url + "/callback",
-        scope=["openid", "email", "profile"],
-    )
-    return redirect(request_uri)
-
-
-@app.route("/login/callback")
-def callback():
-    """Get authorization code Google sent back to you"""
-    code = request.args.get("code")
-    google_provider_cfg = get_google_provider_cfg()
-    token_endpoint = google_provider_cfg["token_endpoint"]
-    token_url, headers, body = client.prepare_token_request(
-        token_endpoint, authorization_response=request.url, redirect_url=request.base_url, code=code
-    )
-    token_response = requests.post(
-        token_url,
-        headers=headers,
-        data=body,
-        auth=(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET),
-    )
-
-    # Parse the tokens!
-    client.parse_request_body_response(json.dumps(token_response.json()))
-    userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
-    uri, headers, body = client.add_token(userinfo_endpoint)
-    userinfo_response = requests.get(uri, headers=headers, data=body)
-
-    if userinfo_response.json().get("email_verified"):
-        unique_id = userinfo_response.json()["sub"]
-        users_email = userinfo_response.json()["email"]
-        picture = userinfo_response.json()["picture"]
-        users_name = userinfo_response.json()["given_name"]
-    else:
-        return "User email not available or not verified by Google.", 400
-
-    # 403 if user is not in approved emails
-    if users_email not in APPROVED_EMAILS:
-        abort(403)
-
-    user = User(id_=unique_id, name=users_name, email=users_email, profile_pic=picture)
-    if not User.get(unique_id):
-        User.create(unique_id, users_name, users_email, picture)
-
+    """Log in with an email and a password."""
+    if request.method == "GET":
+        return render_template("login.html", error=None)
+    email = request.form.get("email", "")
+    password = request.form.get("password", "")
+    user = User.authenticate(email, password)
+    if user is None:
+        return render_template("login.html", error="Неверный email или пароль."), 401
     login_user(user)
-
     return redirect(url_for("index"))
 
 
@@ -166,7 +109,7 @@ def viewitem(itemindex):
 
     hidden = "hidden"
 
-    if current_user.is_authenticated and current_user.email in APPROVED_EMAILS:
+    if current_user.is_authenticated:
         hidden = ""
     print(current_letter_data)
     return render_template("letterview.html", data=current_letter_data, hidden=hidden)
@@ -177,8 +120,6 @@ def newletter():
     """The page for creating a new letter"""
     if not current_user.is_authenticated:
         abort(403)
-    if current_user.email not in APPROVED_EMAILS:
-        abort(403)
     return render_template("newletter.html")
 
 
@@ -186,8 +127,6 @@ def newletter():
 def finalise_new_letter():
     """Finalise the process of creating a new letter."""
     if not current_user.is_authenticated:
-        abort(403)
-    if current_user.email not in APPROVED_EMAILS:
         abort(403)
     formdata = dict(request.form)
 
@@ -201,8 +140,6 @@ def finalise_new_letter():
 def edititem(itemindex):
     """Edit page of a specific letter."""
     if not current_user.is_authenticated:
-        abort(403)
-    if current_user.email not in APPROVED_EMAILS:
         abort(403)
     if not itemindex.isdigit():
         abort(400)
@@ -222,8 +159,6 @@ def finalise_edit(itemindex):
     global DATADICT
     if not current_user.is_authenticated:
         abort(403)
-    if current_user.email not in APPROVED_EMAILS:
-        abort(403)
     if not itemindex.isdigit():
         abort(400)
     for cnt, elem in enumerate(DATADICT):
@@ -237,8 +172,6 @@ def finalise_edit(itemindex):
 @app.route("/delete/<string:itemindex>", methods=["GET"])
 def delete_letter(itemindex):
     if not current_user.is_authenticated:
-        abort(403)
-    if current_user.email not in APPROVED_EMAILS:
         abort(403)
     if not itemindex.isdigit():
         abort(400)
