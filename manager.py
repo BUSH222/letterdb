@@ -3,10 +3,15 @@ import getpass
 import os
 import secrets
 import shutil
-from datetime import datetime
+from datetime import UTC, datetime
 
-import app_helper
-from user import User
+from sqlalchemy import delete
+from sqlalchemy.engine import make_url
+
+from letterdb import users
+from letterdb.config import DATABASE_URL, set_env_value
+from letterdb.db import SessionLocal, create_tables
+from letterdb.models import Letter
 
 
 def prompt_password():
@@ -17,20 +22,40 @@ def prompt_password():
     return password
 
 
+def clear_letters():
+    """Delete every letter."""
+    with SessionLocal() as session:
+        session.execute(delete(Letter))
+        session.commit()
+
+
+def backup(directory):
+    """Copy the SQLite database file into `directory`, keeping at most ~10 backups."""
+    url = make_url(DATABASE_URL)
+    if url.get_backend_name() != "sqlite" or url.database is None:
+        raise ValueError("backup only supports SQLite; use pg_dump / mysqldump for other databases.")
+    if not os.path.isdir(directory):
+        raise ValueError(f"Not a directory: {directory}")
+    backups = sorted(os.listdir(directory))
+    if len(backups) > 10 and os.path.isfile(os.path.join(directory, backups[0])):
+        os.remove(os.path.join(directory, backups[0]))
+    stamp = datetime.now(UTC).strftime("%Y-%m-%d_%H-%M-%S")
+    shutil.copy(url.database, os.path.join(directory, f"maindb_{stamp}.db"))
+
+
 def main():
     """Main argparser function."""
     parser = argparse.ArgumentParser(description="Manage your database.")
     subparsers = parser.add_subparsers(dest="command")
 
-    new_parser = subparsers.add_parser("new", help="Create a new database.")
-    new_parser.add_argument("--force", action="store_true", help="Forcefully overwrite the database.")
+    new_parser = subparsers.add_parser("new", help="Create the database tables.")
+    new_parser.add_argument("--force", action="store_true", help="Drop and recreate the tables.")
 
-    subparsers.add_parser("load", help="Load a database.")
-    subparsers.add_parser("clear", help="Clear a database.")
-    subparsers.add_parser("close", help="Close a database.")
+    clear_parser = subparsers.add_parser("clear", help="Delete every letter.")
+    clear_parser.add_argument("--force", action="store_true", help="Recreate the tables, overwriting the data.")
 
     quick_setup_parser = subparsers.add_parser("quick_setup", help="Quick setup")
-    quick_setup_parser.add_argument("-e", "--email", type=str, help="Email of the first user.", required=True)
+    quick_setup_parser.add_argument("-e", "--email", type=str, help="Email (prompted for if omitted).")
     quick_setup_parser.add_argument("-p", "--password", type=str, help="Password (prompted for if omitted).")
 
     user_add_parser = subparsers.add_parser("user_add", help="Create a user.")
@@ -49,8 +74,8 @@ def main():
 
     subparsers.add_parser("user_list", help="List all users.")
 
-    backup_parser = subparsers.add_parser("backup", help="Create a backup of the database.")
-    backup_parser.add_argument("-dir", "--directory", type=str, help="Directory of the backup folder.")
+    backup_parser = subparsers.add_parser("backup", help="Create a backup of the database (SQLite only).")
+    backup_parser.add_argument("-dir", "--directory", type=str, required=True, help="Directory of the backups.")
 
     args = parser.parse_args()
 
@@ -63,46 +88,43 @@ def main():
 
 def run(args, parser):
     """Run the chosen command."""
-
+    if args.command not in (None, "new", "quick_setup", "backup"):
+        create_tables()  # creates any missing table (e.g. users); existing data is untouched
     if args.command == "new":
-        app_helper.create_table(args.force)
-    elif args.command == "load":
-        app_helper.load_data()
+        create_tables(force=args.force)
     elif args.command == "clear":
-        app_helper.clear_table()
-    elif args.command == "close":
-        app_helper.close_conn()
+        if args.force:
+            create_tables(force=True)
+        else:
+            clear_letters()
     elif args.command == "quick_setup":
-        # Initialise and load the database
-        app_helper.create_table(force=True)
-        app_helper.load_data()
-        if not os.environ.get("SECRET_KEY"):
-            app_helper.set_env_value("SECRET_KEY", secrets.token_hex(32))
-        User.create(args.email, args.password or prompt_password())
+        email = args.email or input("Email: ").strip()
+        password = args.password or prompt_password()
+        create_tables()
+        if not os.environ.get("SECRET_KEY", ""):
+            set_env_value("SECRET_KEY", secrets.token_hex(32))
+        with SessionLocal() as session:
+            users.create(session, email, password)
     elif args.command == "user_add":
-        User.create(args.email, args.password or prompt_password())
+        with SessionLocal() as session:
+            users.create(session, args.email, args.password or prompt_password())
     elif args.command == "user_edit":
         if args.new_email is None and args.password is None:
             parser.error("user_edit needs --new_email and/or --password.")
         new_password = None
         if args.password is not None:
             new_password = args.password or prompt_password()
-        User.update(args.email, new_email=args.new_email, new_password=new_password)
+        with SessionLocal() as session:
+            users.update(session, args.email, new_email=args.new_email, new_password=new_password)
     elif args.command == "user_delete":
-        User.delete(args.email)
+        with SessionLocal() as session:
+            users.delete(session, args.email)
     elif args.command == "user_list":
-        for user in User.all():
-            print(f"{user.id}\t{user.email}")
+        with SessionLocal() as session:
+            for user in users.all_users(session):
+                print(f"{user.id}\t{user.email}")
     elif args.command == "backup":
-        bdir = args.directory
-        assert os.path.isdir(bdir)
-        filename = datetime.utcnow().strftime("%Y-%m-%d_%H:%M:%S")
-        backupcnt = len(os.listdir(bdir))
-        if backupcnt > 10:
-            oldest = sorted(os.listdir(bdir))[0]
-            if os.path.isfile(os.path.join(bdir, oldest)):
-                os.remove(os.path.join(bdir, oldest))
-        shutil.copy("maindb.db", os.path.join(bdir, f"maindb_{filename}.db "))
+        backup(args.directory)
     else:
         parser.print_help()
 

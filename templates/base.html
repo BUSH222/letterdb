@@ -1,0 +1,91 @@
+{#
+  base.html - shared layout for all public pages (banner, navbar, sticky footer).
+
+  Child template example:
+
+    {% extends "base.html" %}
+    {% block title %}Поиск по письмам{% endblock %}
+    {% block banner_title %}Поиск по письмам{% endblock %}
+    {% block content %}
+      <section class="ob-page py-4"> ... </section>
+    {% endblock %}
+
+  Home page only: also set {% block banner_class %}ob-banner-lg{% endblock %}
+  and {% block banner_subtitle %}Информационная система ГИН РАН{% endblock %}.
+  Staff pages (login, newletter, letteredit): override {% block banner %}{% endblock %}
+  with nothing to hide the banner, and {% block footer %}{% endblock %} to hide the footer.
+
+  Files expected in /static: theme.css, rc_images/banner.jpg (served by FastAPI's /static mount).
+#}
+{%- set nav_items = [
+  ('/',       'О системе'),
+  ('/search', 'Поиск'),
+] -%}
+{%- set catalog_items = [
+  ('/list/date',      'По датам'),
+  ('/list/addressee', 'По адресатам'),
+  ('/list/keywords',  'По ключевым словам'),
+  ('/list/region',    'По регионам'),
+] -%}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Письма В.А. Обручева{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/theme.css">
+  {% block head %}{% endblock %}
+</head>
+<body>
+<div class="d-flex flex-column min-vh-100">
+
+  {% block banner %}
+  <header class="ob-banner {% block banner_class %}{% endblock %} d-flex align-items-center justify-content-center text-center py-3">
+    <div class="px-3">
+      {% block banner_subtitle %}{% endblock %}
+      <h1 class="h2 fw-bold text-cream mb-0">{% block banner_title %}{% endblock %}</h1>
+    </div>
+  </header>
+  {% endblock %}
+
+  {% block navbar %}
+  <nav class="navbar navbar-expand-md ob-navbar" data-bs-theme="dark" aria-label="Главное меню">
+    <div class="container-fluid">
+      <button class="navbar-toggler ms-auto my-1" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Меню">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-center" id="mainNav">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link{{ ' active' if request.path == nav_items[0][0] }}" href="{{ nav_items[0][0] }}">{{ nav_items[0][1] }}</a></li>
+          <li class="nav-item"><a class="nav-link{{ ' active' if request.path.startswith(nav_items[1][0]) }}" href="{{ nav_items[1][0] }}">{{ nav_items[1][1] }}</a></li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle{{ ' active' if request.path.startswith('/list') }}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Каталог</a>
+            <ul class="dropdown-menu">
+              {% for href, label in catalog_items %}
+              <li><a class="dropdown-item{{ ' active' if request.path == href }}" href="{{ href }}">{{ label }}</a></li>
+              {% endfor %}
+            </ul>
+          </li>
+          <li class="nav-item"><a class="nav-link{{ ' active' if request.path.startswith('/about') }}" href="/about">О письмах</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  {% endblock %}
+
+  <main class="flex-grow-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% block footer %}
+  <footer class="ob-footer text-center fst-italic py-2 px-3 mt-auto">
+    <a href="http://www.ginras.ru/struct/19/9/index.php">Группа истории геологии</a>, Геологический институт РАН, Москва
+  </footer>
+  {% endblock %}
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

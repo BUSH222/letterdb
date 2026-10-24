@@ -9,6 +9,7 @@ dependencies = [
     "Jinja2>=3.1.4",
     "python-dotenv==1.0.0",
     "python-multipart>=0.0.20",
+    "sqlalchemy>=2.0",
     "uvicorn>=0.32.0",
     "Werkzeug>=3.1.0",
 ]
@@ -48,6 +49,8 @@ select = [
 ]
 ignore = [
     "RUF001",  # Cyrillic strings are intentional in this project
+    "RUF002",  # ...and in docstrings
+    "RUF003",  # ...and in comments
 ]
 fixable = ["ALL"]
 
@@ -71,4 +74,10 @@ error-on-warning = false
 
 [tool.ty.rules]
 all = "warn"
+
+# `x: Mapped[T] = mapped_column(...)` is the standard SQLAlchemy declaration
+[[tool.ty.overrides]]
+include = ["letterdb/models.py"]
+[tool.ty.overrides.rules]
+unsound-assignment = "ignore"
 

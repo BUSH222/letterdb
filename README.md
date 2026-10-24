@@ -16,8 +16,27 @@ This repository contains the source code for LetterDB, a web application that al
 5) Run the application using `uv run app.py` (or `uv run uvicorn app:app --reload` for development).
 This serves plain HTTP on 127.0.0.1:8000; put it behind a TLS-terminating server for release.
 
+## Database
+The app uses SQLAlchemy. The database is set by `DATABASE_URL` (in the environment or `.env`) and defaults to `sqlite:///maindb.db`.
+To use another database, install its driver and point `DATABASE_URL` at it:
+- PostgreSQL: `uv add "psycopg[binary]"`, then `DATABASE_URL=postgresql+psycopg://user:password@host/dbname`
+- MySQL: `uv add pymysql`, then `DATABASE_URL=mysql+pymysql://user:password@host/dbname`
+
+Missing tables are created when the app or `manager.py` starts. Other `manager.py` commands:
+- `new [--force]`: create the tables (`--force` recreates the letters table; users are kept)
+- `load`: load the letters from `documents-txt/`
+- `clear`: delete every letter
+- `backup -dir <directory>`: copy the SQLite database file (for other databases use `pg_dump` / `mysqldump`)
+
+## Pages
+- `/`, `/about`, `/instructions`: information pages
+- `/search`: the full catalogue. Text search covers the letter text, the addressee, and comments/notes (case-insensitive, ё = е). It also accepts one filter: `?year=`, `?addressee=`, `?keyword=` or `?region=`
+- `/list/date`, `/list/addressee`, `/list/keywords`, `/list/region`: the catalogue lists; each entry links to the filtered search
+- `/viewitem/<catalogue>`: a single letter
+- Staff only: `/newletter`, `/edit/<catalogue>`, and delete (a POST from the letter page)
+
 ## Users
-Users log in at `/login` with an email and password (stored hashed in `maindb.db`). Manage them with:
+Staff log in at `/login` (deliberately not linked from any page) with an email and password (stored hashed in `maindb.db`). Manage them with:
 - `uv run manager.py user_add <email> [-p <password>]`
 - `uv run manager.py user_edit <email> [-e <new_email>] [-p [<new_password>]]`
 - `uv run manager.py user_delete <email>`

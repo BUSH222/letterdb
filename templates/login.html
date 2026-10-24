@@ -1,20 +1,16 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
+{% block title %}Вход{% endblock %}
+{% block banner %}{% endblock %}
+{% block footer %}{% endblock %}
 
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Вход</title>
-</head>
-
-<body>
-	<h1>Вход</h1>
-	{% if error %}<p style="color: #b00020;">{{ error }}</p>{% endif %}
-	<form method="POST" action="/login">
-		<p><label>Email<br><input type="email" name="email" required autofocus></label></p>
-		<p><label>Пароль<br><input type="password" name="password" required></label></p>
-		<button type="submit">Войти</button>
-	</form>
-</body>
-
-</html>
+{% block content %}
+<div class="container-fluid px-4 py-3">
+  <h1 class="h2">Вход</h1>
+  {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
+  <form method="post" action="/login">
+    <div class="mb-3"><label class="form-label" for="email">Email</label><input type="email" class="form-control" id="email" name="email" required></div>
+    <div class="mb-3"><label class="form-label" for="password">Пароль</label><input type="password" class="form-control" id="password" name="password" required></div>
+    <button type="submit" class="btn btn-gold">Войти</button>
+  </form>
+</div>
+{% endblock %}
