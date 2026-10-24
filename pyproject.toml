@@ -4,10 +4,13 @@ version = "0.1.0"
 description = "Web application for the interactive storage of letters of Vladimir Obruchev"
 requires-python = ">=3.14"
 dependencies = [
-    "cryptography>=50.0.2",
-    "Flask>=3.1.0",
-    "Flask_Login>=0.6.3",
+    "fastapi>=0.115.0",
+    "itsdangerous>=2.2.0",
+    "Jinja2>=3.1.4",
     "python-dotenv==1.0.0",
+    "python-multipart>=0.0.20",
+    "uvicorn>=0.32.0",
+    "Werkzeug>=3.1.0",
 ]
 
 [dependency-groups]

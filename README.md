@@ -13,8 +13,8 @@ This repository contains the source code for LetterDB, a web application that al
     - run `uv run manager.py quick_setup --email=<email>` (you will be prompted for a password; `--password` is also accepted)
 
     This creates the letter database, a `SECRET_KEY` in `.env`, and the first user.
-5) Run the application using `uv run app.py`. \
-Please do note that this will run with an unsigned certificate. Proper hosting is required for release.
+5) Run the application using `uv run app.py` (or `uv run uvicorn app:app --reload` for development).
+This serves plain HTTP on 127.0.0.1:8000; put it behind a TLS-terminating server for release.
 
 ## Users
 Users log in at `/login` with an email and password (stored hashed in `maindb.db`). Manage them with:

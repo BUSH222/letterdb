@@ -1,22 +1,12 @@
 import os
+from typing import Annotated
 
-from flask import (
-    Flask,
-    abort,
-    redirect,
-    render_template,
-    request,
-    url_for,
-)
-
-# Login management imports
-from flask_login import (
-    LoginManager,
-    current_user,
-    login_required,
-    login_user,
-    logout_user,
-)
+import uvicorn
+from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from starlette.middleware.sessions import SessionMiddleware
 
 from app_helper import (
     CHECKBOX_INPUT_FIELDS,
@@ -31,75 +21,95 @@ from app_helper import (
 # Internal imports
 from user import User
 
-app = Flask(__name__)
+app = FastAPI()
 
 # Load data at start
 DATADICT = unload_data()
 
-# Login management
-app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(24)
-
-login_manager = LoginManager()
-login_manager.init_app(app)
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    """Load the user data."""
-    return User.get(user_id)
+# Login management: the id of the logged in user is kept in a signed session cookie
+app.add_middleware(SessionMiddleware, secret_key=os.environ.get("SECRET_KEY") or os.urandom(24).hex())
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
 
-@app.route("/")
-def index():
-    """Index of the webpage."""
-    return render_template("index.html")
+def get_current_user(request: Request) -> User | None:
+    """Return the logged in user, if any."""
+    user_id = request.session.get("user_id")
+    return User.get(user_id) if user_id is not None else None
 
 
-@app.route("/about")
-def about():
-    """About page."""
-    return render_template("about.html")
+CurrentUser = Annotated[User | None, Depends(get_current_user)]
 
 
-@app.route("/contact")
-def contact():
-    """Contact page."""
-    return render_template("contact.html")
-
-
-@app.route("/search_manual")
-def search_manual():
-    """Contact page."""
-    return render_template("search_manual.html")
-
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    """Log in with an email and a password."""
-    if request.method == "GET":
-        return render_template("login.html", error=None)
-    email = request.form.get("email", "")
-    password = request.form.get("password", "")
-    user = User.authenticate(email, password)
+def require_user(user: CurrentUser) -> User:
+    """Dependency which rejects requests from anonymous visitors."""
     if user is None:
-        return render_template("login.html", error="Неверный email или пароль."), 401
-    login_user(user)
-    return redirect(url_for("index"))
+        raise HTTPException(status_code=403)
+    return user
 
 
-@app.route("/logout")
-@login_required
-def logout():
+def redirect(url: str) -> RedirectResponse:
+    """Redirect after an action; 303 makes the browser follow with a GET."""
+    return RedirectResponse(url, status_code=303)
+
+
+@app.get("/", response_class=HTMLResponse)
+async def index(request: Request):
+    """Index of the webpage."""
+    return templates.TemplateResponse(request, "index.html")
+
+
+@app.get("/about", response_class=HTMLResponse)
+async def about(request: Request):
+    """About page."""
+    return templates.TemplateResponse(request, "about.html")
+
+
+@app.get("/contact", response_class=HTMLResponse)
+async def contact(request: Request):
+    """Contact page."""
+    return templates.TemplateResponse(request, "contact.html")
+
+
+@app.get("/search_manual", response_class=HTMLResponse)
+async def search_manual(request: Request):
+    """Contact page."""
+    return templates.TemplateResponse(request, "search_manual.html")
+
+
+@app.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    """The login form."""
+    return templates.TemplateResponse(request, "login.html", {"error": None})
+
+
+@app.post("/login", response_class=HTMLResponse)
+async def login(request: Request):
+    """Log in with an email and a password."""
+    form = await request.form()
+    user = User.authenticate(str(form.get("email", "")), str(form.get("password", "")))
+    if user is None:
+        return templates.TemplateResponse(
+            request, "login.html", {"error": "Неверный email или пароль."}, status_code=401
+        )
+    request.session["user_id"] = user.id
+    return redirect("/")
+
+
+@app.get("/logout")
+async def logout(request: Request, user: CurrentUser):
     """Log out"""
-    logout_user()
-    return redirect(url_for("index"))
+    if user is None:
+        raise HTTPException(status_code=401)
+    request.session.clear()
+    return redirect("/")
 
 
-@app.route("/viewitem/<string:itemindex>")
-def viewitem(itemindex):
+@app.get("/viewitem/{itemindex}", response_class=HTMLResponse)
+async def viewitem(request: Request, itemindex: str, user: CurrentUser):
     """The page of a specific letter."""
     if not itemindex.isdigit():
-        abort(400)
+        raise HTTPException(status_code=400)
     current_letter_data = {}
 
     for elem in DATADICT:
@@ -107,42 +117,33 @@ def viewitem(itemindex):
             current_letter_data = elem
             break
 
-    hidden = "hidden"
-
-    if current_user.is_authenticated:
-        hidden = ""
+    hidden = "" if user else "hidden"
     print(current_letter_data)
-    return render_template("letterview.html", data=current_letter_data, hidden=hidden)
+    return templates.TemplateResponse(request, "letterview.html", {"data": current_letter_data, "hidden": hidden})
 
 
-@app.route("/newletter")
-def newletter():
+@app.get("/newletter", response_class=HTMLResponse, dependencies=[Depends(require_user)])
+async def newletter(request: Request):
     """The page for creating a new letter"""
-    if not current_user.is_authenticated:
-        abort(403)
-    return render_template("newletter.html")
+    return templates.TemplateResponse(request, "newletter.html")
 
 
-@app.route("/finalise_new_letter", methods=["POST"])
-def finalise_new_letter():
+@app.post("/finalise_new_letter", dependencies=[Depends(require_user)])
+async def finalise_new_letter(request: Request):
     """Finalise the process of creating a new letter."""
-    if not current_user.is_authenticated:
-        abort(403)
-    formdata = dict(request.form)
+    formdata = dict(await request.form())
 
     DATADICT.append(formdata)
     add_row(formdata.values())
 
-    return redirect(url_for("viewitem", itemindex=formdata["catalogue"]))
+    return redirect(f"/viewitem/{formdata['catalogue']}")
 
 
-@app.route("/edit/<string:itemindex>")
-def edititem(itemindex):
+@app.get("/edit/{itemindex}", response_class=HTMLResponse, dependencies=[Depends(require_user)])
+async def edititem(request: Request, itemindex: str):
     """Edit page of a specific letter."""
-    if not current_user.is_authenticated:
-        abort(403)
     if not itemindex.isdigit():
-        abort(400)
+        raise HTTPException(status_code=400)
     current_letter_data = {}
 
     for elem in DATADICT:
@@ -150,31 +151,27 @@ def edititem(itemindex):
             current_letter_data = elem
             break
 
-    return render_template("letteredit.html", data=current_letter_data)
+    return templates.TemplateResponse(request, "letteredit.html", {"data": current_letter_data})
 
 
-@app.route("/finalise_edit/<string:itemindex>", methods=["POST", "GET"])
-def finalise_edit(itemindex):
+@app.post("/finalise_edit/{itemindex}", dependencies=[Depends(require_user)])
+async def finalise_edit(request: Request, itemindex: str):
     """Finalise the editing process, save results."""
-    global DATADICT
-    if not current_user.is_authenticated:
-        abort(403)
     if not itemindex.isdigit():
-        abort(400)
+        raise HTTPException(status_code=400)
+    formdata = dict(await request.form())
     for cnt, elem in enumerate(DATADICT):
-        if elem["catalogue"] == itemindex and dict(request.form).keys() == elem.keys():
-            DATADICT[cnt] = dict(request.form)
+        if elem["catalogue"] == itemindex and formdata.keys() == elem.keys():
+            DATADICT[cnt] = formdata
             break
-    update_row(dict(request.form), itemindex)
-    return redirect(url_for("viewitem", itemindex=itemindex))
+    update_row(formdata, itemindex)
+    return redirect(f"/viewitem/{itemindex}")
 
 
-@app.route("/delete/<string:itemindex>", methods=["GET"])
-def delete_letter(itemindex):
-    if not current_user.is_authenticated:
-        abort(403)
+@app.get("/delete/{itemindex}", dependencies=[Depends(require_user)])
+async def delete_letter(itemindex: str):
     if not itemindex.isdigit():
-        abort(400)
+        raise HTTPException(status_code=400)
     todel = None
     for elem in DATADICT:
         if elem["catalogue"] == itemindex:
@@ -182,31 +179,28 @@ def delete_letter(itemindex):
             break
     DATADICT.remove(todel)
     delete_row(itemindex)
-    return redirect(url_for("search"))
+    return redirect("/search")
 
 
-@app.route("/search", methods=["POST", "GET"])
-def search():
+@app.get("/search", response_class=HTMLResponse)
+@app.post("/search", response_class=HTMLResponse)
+async def search(request: Request, user: CurrentUser):
     """Return the search values."""
-    hidden = "hidden"
+    context = {"data": DATADICT, "notfoundhidden": "hidden", "authenticated": user is not None}
     if request.method == "POST":
-        query = dict(request.form)
+        query = dict(await request.form())
         textfields = {}
         checkbox_items_on = []
-        for s in query.items():
-            if s[0] in TEXT_INPUT_FIELDS:
-                textfields[s[0]] = s[1]
-            elif s[0] in CHECKBOX_INPUT_FIELDS and s[1] == "on":
-                checkbox_items_on.append(s[0])
-        tempdata = filter_data(DATADICT, textfields, sorting_params=checkbox_items_on)
-        if len(tempdata) != 0:
-            return render_template("search.html", data=tempdata, notfoundhidden=hidden)
-        else:
-            return render_template("search.html", data=tempdata, notfoundhidden="")
-
-    else:
-        return render_template("search.html", data=DATADICT, notfoundhidden=hidden)
+        for key, value in query.items():
+            if key in TEXT_INPUT_FIELDS:
+                textfields[key] = value
+            elif key in CHECKBOX_INPUT_FIELDS and value == "on":
+                checkbox_items_on.append(key)
+        context["data"] = filter_data(DATADICT, textfields, sorting_params=checkbox_items_on)
+        if len(context["data"]) == 0:
+            context["notfoundhidden"] = ""
+    return templates.TemplateResponse(request, "search.html", context)
 
 
 if __name__ == "__main__":
-    app.run(ssl_context="adhoc")
+    uvicorn.run(app)

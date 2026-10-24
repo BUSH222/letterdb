@@ -77,7 +77,7 @@
 		<div id="container_29ee7549">
 			<div id="container_29ee7549_padding">
 				<div class="textstyle3"><span class="textstyle7">Поиск по писем В.А. Обручева</span>
-					{% if current_user.is_authenticated %} <button onclick="location.href='/newletter'">New record</button> {% endif %}
+					{% if authenticated %} <button onclick="location.href='/newletter'">New record</button> {% endif %}
 						<span class="textstyle8"><br /></span>
 					<ul id="ul_7b56f8c2" class="ulstyle1">
 						<li><span class="textstyle8">Поиск по письмам можно осуществлять по разным параметрам и в

@@ -1,4 +1,3 @@
-from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app_helper import con, cur
@@ -31,7 +30,7 @@ def validate_password(password):
         raise ValueError(f"The password must be at least {MIN_PASSWORD_LENGTH} characters long.")
 
 
-class User(UserMixin):
+class User:
     """A user, stored in the users table of the main database."""
 
     def __init__(self, id_, email, password_hash):
@@ -41,7 +40,7 @@ class User(UserMixin):
 
     @staticmethod
     def _from_row(row):
-        return User(*row) if row else None
+        return User(row[0], row[1], row[2]) if row else None
 
     @staticmethod
     def get(user_id):
@@ -68,7 +67,7 @@ class User(UserMixin):
     def all():
         """Return all users."""
         cur.execute("SELECT id, email, password_hash FROM users ORDER BY id")
-        return [User(*row) for row in cur.fetchall()]
+        return [User(row[0], row[1], row[2]) for row in cur.fetchall()]
 
     @staticmethod
     def create(email, password):
