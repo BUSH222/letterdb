@@ -1,14 +1,17 @@
-from flask import (
-    Flask,
-    render_template,
-    redirect,
-    request,
-    url_for,
-    abort,
-)
+import contextlib
+import json
 import os
 import sqlite3
-import json
+
+import requests
+from flask import (
+    Flask,
+    abort,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 
 # Login management imports
 from flask_login import (
@@ -19,25 +22,24 @@ from flask_login import (
     logout_user,
 )
 from oauthlib.oauth2 import WebApplicationClient
-import requests
 
+from app_helper import (
+    APPROVED_EMAILS,
+    CHECKBOX_INPUT_FIELDS,
+    GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET,
+    TEXT_INPUT_FIELDS,
+    add_row,
+    delete_row,
+    filter_data,
+    get_google_provider_cfg,
+    unload_data,
+    update_row,
+)
 
 # Internal imports
 from db import init_db_command
 from user import User
-from app_helper import (
-    TEXT_INPUT_FIELDS,
-    CHECKBOX_INPUT_FIELDS,
-    GOOGLE_CLIENT_SECRET,
-    GOOGLE_CLIENT_ID,
-    APPROVED_EMAILS,
-    unload_data,
-    filter_data,
-    get_google_provider_cfg,
-    update_row,
-    add_row,
-    delete_row,
-)
 
 app = Flask(__name__)
 
@@ -50,10 +52,8 @@ app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(24)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-try:
+with contextlib.suppress(sqlite3.OperationalError):
     init_db_command()
-except sqlite3.OperationalError:
-    pass
 
 client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
@@ -67,25 +67,25 @@ def load_user(user_id):
 @app.route("/")
 def index():
     """Index of the webpage."""
-    return render_template('index.html')
+    return render_template("index.html")
 
 
 @app.route("/about")
 def about():
     """About page."""
-    return render_template('about.html')
+    return render_template("about.html")
 
 
 @app.route("/contact")
 def contact():
     """Contact page."""
-    return render_template('contact.html')
+    return render_template("contact.html")
 
 
 @app.route("/search_manual")
 def search_manual():
     """Contact page."""
-    return render_template('search_manual.html')
+    return render_template("search_manual.html")
 
 
 @app.route("/login")
@@ -108,10 +108,7 @@ def callback():
     google_provider_cfg = get_google_provider_cfg()
     token_endpoint = google_provider_cfg["token_endpoint"]
     token_url, headers, body = client.prepare_token_request(
-        token_endpoint,
-        authorization_response=request.url,
-        redirect_url=request.base_url,
-        code=code
+        token_endpoint, authorization_response=request.url, redirect_url=request.base_url, code=code
     )
     token_response = requests.post(
         token_url,
@@ -155,7 +152,7 @@ def logout():
     return redirect(url_for("index"))
 
 
-@app.route('/viewitem/<string:itemindex>')
+@app.route("/viewitem/<string:itemindex>")
 def viewitem(itemindex):
     """The page of a specific letter."""
     if not itemindex.isdigit():
@@ -163,7 +160,7 @@ def viewitem(itemindex):
     current_letter_data = {}
 
     for elem in DATADICT:
-        if elem['catalogue'] == itemindex:
+        if elem["catalogue"] == itemindex:
             current_letter_data = elem
             break
 
@@ -175,7 +172,7 @@ def viewitem(itemindex):
     return render_template("letterview.html", data=current_letter_data, hidden=hidden)
 
 
-@app.route('/newletter')
+@app.route("/newletter")
 def newletter():
     """The page for creating a new letter"""
     if not current_user.is_authenticated:
@@ -185,7 +182,7 @@ def newletter():
     return render_template("newletter.html")
 
 
-@app.route('/finalise_new_letter', methods=['POST'])
+@app.route("/finalise_new_letter", methods=["POST"])
 def finalise_new_letter():
     """Finalise the process of creating a new letter."""
     if not current_user.is_authenticated:
@@ -200,7 +197,7 @@ def finalise_new_letter():
     return redirect(url_for("viewitem", itemindex=formdata["catalogue"]))
 
 
-@app.route('/edit/<string:itemindex>')
+@app.route("/edit/<string:itemindex>")
 def edititem(itemindex):
     """Edit page of a specific letter."""
     if not current_user.is_authenticated:
@@ -212,14 +209,14 @@ def edititem(itemindex):
     current_letter_data = {}
 
     for elem in DATADICT:
-        if elem['catalogue'] == itemindex:
+        if elem["catalogue"] == itemindex:
             current_letter_data = elem
             break
 
     return render_template("letteredit.html", data=current_letter_data)
 
 
-@app.route('/finalise_edit/<string:itemindex>', methods=['POST', 'GET'])
+@app.route("/finalise_edit/<string:itemindex>", methods=["POST", "GET"])
 def finalise_edit(itemindex):
     """Finalise the editing process, save results."""
     global DATADICT
@@ -229,18 +226,15 @@ def finalise_edit(itemindex):
         abort(403)
     if not itemindex.isdigit():
         abort(400)
-    cnt = 0
-    for elem in DATADICT:
-        if elem['catalogue'] == itemindex:
-            if dict(request.form).keys() == elem.keys():
-                DATADICT[cnt] = dict(request.form)
-                break
-        cnt += 1
+    for cnt, elem in enumerate(DATADICT):
+        if elem["catalogue"] == itemindex and dict(request.form).keys() == elem.keys():
+            DATADICT[cnt] = dict(request.form)
+            break
     update_row(dict(request.form), itemindex)
-    return redirect(url_for('viewitem', itemindex=itemindex))
+    return redirect(url_for("viewitem", itemindex=itemindex))
 
 
-@app.route('/delete/<string:itemindex>', methods=['GET'])
+@app.route("/delete/<string:itemindex>", methods=["GET"])
 def delete_letter(itemindex):
     if not current_user.is_authenticated:
         abort(403)
@@ -250,36 +244,36 @@ def delete_letter(itemindex):
         abort(400)
     todel = None
     for elem in DATADICT:
-        if elem['catalogue'] == itemindex:
+        if elem["catalogue"] == itemindex:
             todel = elem
             break
     DATADICT.remove(todel)
     delete_row(itemindex)
-    return redirect(url_for('search'))
+    return redirect(url_for("search"))
 
 
-@app.route('/search', methods=['POST', 'GET'])
+@app.route("/search", methods=["POST", "GET"])
 def search():
     """Return the search values."""
-    hidden = 'hidden'
-    if request.method == 'POST':
+    hidden = "hidden"
+    if request.method == "POST":
         query = dict(request.form)
         textfields = {}
         checkbox_items_on = []
         for s in query.items():
             if s[0] in TEXT_INPUT_FIELDS:
                 textfields[s[0]] = s[1]
-            elif s[0] in CHECKBOX_INPUT_FIELDS and s[1] == 'on':
+            elif s[0] in CHECKBOX_INPUT_FIELDS and s[1] == "on":
                 checkbox_items_on.append(s[0])
         tempdata = filter_data(DATADICT, textfields, sorting_params=checkbox_items_on)
         if len(tempdata) != 0:
-            return render_template('search.html', data=tempdata, notfoundhidden=hidden)
+            return render_template("search.html", data=tempdata, notfoundhidden=hidden)
         else:
-            return render_template('search.html', data=tempdata, notfoundhidden='')
+            return render_template("search.html", data=tempdata, notfoundhidden="")
 
     else:
-        return render_template('search.html', data=DATADICT, notfoundhidden=hidden)
+        return render_template("search.html", data=DATADICT, notfoundhidden=hidden)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(ssl_context="adhoc")

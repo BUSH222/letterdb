@@ -1,0 +1,74 @@
+[project]
+name = "letterdb"
+version = "0.1.0"
+description = "Web application for the interactive storage of letters of Vladimir Obruchev"
+requires-python = ">=3.14"
+dependencies = [
+    "click==8.1.7",
+    "cryptography>=50.0.2",
+    "Flask>=3.1.0",
+    "Flask_Login>=0.6.3",
+    "oauthlib==3.2.2",
+    "python-dotenv==1.0.0",
+    "requests==2.32.2",
+]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.6.2",
+    "ruff>=0.16.5",
+    "ty>=0.0.78",
+]
+
+
+[tool.ruff]
+target-version = "py314"
+line-length = 119
+exclude = [
+    ".venv",
+    "__pycache__",
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    "build",
+    "dist",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle
+    "F",   # Pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+    "C4",  # flake8-comprehensions
+    "RUF", # Ruff-specific rules
+    "TCH", # flake8-type-checking
+]
+ignore = [
+    "RUF001",  # Cyrillic strings are intentional in this project
+]
+fixable = ["ALL"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_functions = "test_*"
+
+[tool.ty.environment]
+python-version = "3.14"
+
+[tool.ty.terminal]
+error-on-warning = false
+
+[tool.ty.rules]
+all = "warn"
+

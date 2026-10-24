@@ -1,4 +1,5 @@
 import sqlite3
+
 import click
 from flask import current_app, g
 from flask.cli import with_appcontext
@@ -7,9 +8,7 @@ from flask.cli import with_appcontext
 def get_db():
     """Retrieve the database object"""
     if "db" not in g:
-        g.db = sqlite3.connect(
-            "sqlite_db", detect_types=sqlite3.PARSE_DECLTYPES
-        )
+        g.db = sqlite3.connect("sqlite_db", detect_types=sqlite3.PARSE_DECLTYPES)
         g.db.row_factory = sqlite3.Row
 
     return g.db
