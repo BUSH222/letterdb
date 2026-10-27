@@ -24,8 +24,8 @@ class LetterForm(BaseModel):
     catalogue: str = ""
     date: str = ""
     addressee: str = ""
-    keywords: str = ""
-    regions: str = ""
+    keywords: list[str] = []  # one form value per tag
+    regions: list[str] = []
     contents_txt: str = ""
     imagelink: str = ""
     comments: str = ""
@@ -53,9 +53,21 @@ def viewitem(request: Request, catalogue: str, session: SessionDep, user: Curren
     )
 
 
+@router.get("/search_keyword_region", dependencies=staff)
+def search_keyword_region(session: SessionDep, keyword: str | None = None, region: str | None = None) -> list[str]:
+    """Existing keywords (?keyword=...) or regions (?region=...) with a word starting with the given text,
+    case-insensitive and with ё = е. Used by the tag inputs on the new/edit pages."""
+    if (keyword is None) == (region is None):
+        raise HTTPException(status_code=400, detail="Pass exactly one of ?keyword= or ?region=.")
+    if keyword is not None:
+        return letters.suggest_terms(session, "keyword", keyword)
+    return letters.suggest_terms(session, "region", region or "")
+
+
 @router.get("/newletter", response_class=HTMLResponse, dependencies=staff)
-def newletter(request: Request):
-    return templates.TemplateResponse(request, "newletter.html", {"data": {}, "error": None})
+def newletter(request: Request, session: SessionDep):
+    data = {"catalogue": letters.next_catalogue(session)}
+    return templates.TemplateResponse(request, "newletter.html", {"data": data, "error": None})
 
 
 @router.post("/finalise_new_letter", dependencies=staff)

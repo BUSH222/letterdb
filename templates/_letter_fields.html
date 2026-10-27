@@ -1,0 +1,48 @@
+{#
+  _letter_fields.html - the fields shared by newletter.html and letteredit.html.
+  Each field is a row: the label on the left, an expandable textarea on the right.
+  Keywords and regions are tag inputs (static/tag_input.js): each tag in the list carries a hidden
+  input, so the form posts one `keywords` / `regions` value per tag. New tags are stored only when
+  the form is saved.
+#}
+{% macro text_field(name, label, value, rows=2) %}
+<div class="row mt-3">
+  <label class="col-lg-3 fw-bold" for="{{ name }}">{{ label }}</label>
+  <div class="col-lg-9">
+    <textarea class="form-control" id="{{ name }}" name="{{ name }}" rows="{{ rows }}">{{ value }}</textarea>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro tag(name, value) -%}
+<li class="list-group-item d-flex justify-content-between align-items-center gap-3">
+  <span class="tag-text">{{ value }}</span>
+  <input type="hidden" name="{{ name }}" value="{{ value }}">
+  <button type="button" class="btn btn-danger btn-sm tag-remove">Удалить</button>
+</li>
+{%- endmacro %}
+
+{% macro tag_field(kind, name, label, values) %}
+<div class="row mt-4 tag-input" data-kind="{{ kind }}" data-name="{{ name }}">
+  <label class="col-lg-3 fw-bold" for="{{ name }}-input">{{ label }}</label>
+  <div class="col-lg-9">
+    <div class="position-relative">
+      <input type="text" id="{{ name }}-input" class="form-control" autocomplete="off"
+             role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="{{ name }}-results">
+      <div id="{{ name }}-results" class="dropdown-menu w-100 tag-results" role="listbox"></div>
+    </div>
+    <ul class="list-group mt-2 tag-list">{% for value in values or [] %}{{ tag(name, value) }}{% endfor %}</ul>
+    <template>{{ tag(name, "") }}</template>
+  </div>
+</div>
+{% endmacro %}
+
+{{ text_field("catalogue", "Каталожный номер / catalogue", data.catalogue, rows=1) }}
+{{ text_field("date", "Дата / date", data.date, rows=1) }}
+{{ text_field("addressee", "Адресат / adressee", data.addressee, rows=1) }}
+{{ text_field("contents_txt", "Текст письма / contents_txt", data.contents_txt, rows=10) }}
+{{ text_field("comments", "Комментарии / comments", data.comments, rows=6) }}
+{{ text_field("notes", "Примечания / notes", data.notes, rows=6) }}
+{{ text_field("imagelink", "Скан письма / imagelink", data.imagelink, rows=3) }}
+{{ tag_field("keyword", "keywords", "Ключевые слова / keywords", data.keywords) }}
+{{ tag_field("region", "regions", "Регионы / regions", data.regions) }}

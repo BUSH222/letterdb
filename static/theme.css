@@ -129,3 +129,25 @@ h1, h2, h3, h4, h5, h6 { font-family: Segoe, "Segoe UI", "Helvetica Neue", sans-
 .ob-cols { column-width: 300px; column-gap: 2.5rem; }
 .ob-cols > li { break-inside: avoid; }
 .ob-years { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); column-gap: 1.5rem; }
+
+/* ---- Letter forms (new/edit): white fields ---- */
+.letter-form .form-control,
+.letter-form .form-control:focus { background-color: #fff; }
+
+/* ---- Tag inputs (keywords / regions on the staff forms, see static/tag_input.js) ---- */
+.tag-results {
+  max-height: 16rem; overflow-y: auto;
+  --bs-dropdown-bg: #fff;
+  --bs-dropdown-border-color: var(--ob-field-edge);
+  --bs-dropdown-link-color: var(--ob-ink);
+  --bs-dropdown-link-hover-color: var(--ob-ink);
+  --bs-dropdown-link-hover-bg: var(--ob-paper-deep);
+  --bs-dropdown-link-active-color: var(--ob-ink);
+  --bs-dropdown-link-active-bg: var(--ob-paper-deep);
+}
+.tag-results .dropdown-item { white-space: normal; }
+.tag-list {
+  --bs-list-group-bg: #fff;
+  --bs-list-group-border-color: var(--ob-field-edge);
+}
+.tag-list:empty { display: none; }

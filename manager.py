@@ -11,7 +11,7 @@ from sqlalchemy.engine import make_url
 from letterdb import users
 from letterdb.config import DATABASE_URL, set_env_value
 from letterdb.db import SessionLocal, create_tables
-from letterdb.models import Letter
+from letterdb.models import Keyword, Letter, LetterKeyword, LetterRegion, Region
 
 
 def prompt_password():
@@ -25,7 +25,8 @@ def prompt_password():
 def clear_letters():
     """Delete every letter."""
     with SessionLocal() as session:
-        session.execute(delete(Letter))
+        for model in (LetterKeyword, LetterRegion, Letter, Keyword, Region):
+            session.execute(delete(model))
         session.commit()
 
 

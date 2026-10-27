@@ -12,8 +12,8 @@
 
   Home page only: also set {% block banner_class %}ob-banner-lg{% endblock %}
   and {% block banner_subtitle %}Информационная система ГИН РАН{% endblock %}.
-  Staff pages (login, newletter, letteredit): override {% block banner %}{% endblock %}
-  with nothing to hide the banner, and {% block footer %}{% endblock %} to hide the footer.
+  Staff pages: the login page overrides {% block banner %}{% endblock %} with nothing to hide the
+  banner; login, newletter and letteredit override {% block footer %}{% endblock %} to hide the footer.
 
   Files expected in /static: theme.css, rc_images/banner.jpg (served by FastAPI's /static mount).
 #}
