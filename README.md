@@ -28,6 +28,10 @@ Missing tables are created when the app or `manager.py` starts. Other `manager.p
 - `clear`: delete every letter
 - `backup -dir <directory>`: copy the SQLite database file (for other databases use `pg_dump` / `mysqldump`)
 
+## Migrations
+One-off schema migrations live in `migration/`. Run them from the project root, in order; each backs up a SQLite database into `maindb-backups/` first and skips itself if already applied:
+- `uv run python -m migration.m01_cleanup_columns`: drops the legacy `published` and `filename` columns, moves stray filename/image-link text into comments, makes `catalogue` an integer and strips trailing dots from dates
+
 ## Pages
 - `/`, `/about`, `/instructions`: information pages
 - `/search`: the full catalogue. Text search covers the letter text, the addressee, and comments/notes (case-insensitive, ё = е). It also accepts one filter: `?year=`, `?addressee=`, `?keyword=` or `?region=`

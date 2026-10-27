@@ -5,20 +5,17 @@ from letterdb.db import Base
 
 
 class Letter(Base):
-    """A letter. Maps the legacy `letterdb` table as it is; the schema gets normalised later."""
+    """A letter."""
 
     __tablename__ = "letterdb"
 
-    # The legacy table has no primary key constraint, but catalogue values are unique.
-    catalogue: Mapped[str] = mapped_column(Text, primary_key=True)
+    catalogue: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
     date: Mapped[str | None] = mapped_column(Text)
     addressee: Mapped[str | None] = mapped_column("adressee", Text)  # column name typo is legacy
     keywords: Mapped[str | None] = mapped_column(Text)
     regions: Mapped[str | None] = mapped_column(Text)
     contents_txt: Mapped[str | None] = mapped_column(Text)
-    filename: Mapped[str | None] = mapped_column(Text)
     imagelink: Mapped[str | None] = mapped_column(Text)
-    published: Mapped[str | None] = mapped_column(Text, default="0")
     comments: Mapped[str | None] = mapped_column(Text)
     notes: Mapped[str | None] = mapped_column(Text)
 

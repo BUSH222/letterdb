@@ -27,9 +27,7 @@ class LetterForm(BaseModel):
     keywords: str = ""
     regions: str = ""
     contents_txt: str = ""
-    filename: str = ""
     imagelink: str = ""
-    published: str = ""
     comments: str = ""
     notes: str = ""
 
@@ -38,9 +36,10 @@ LetterFormDep = Annotated[LetterForm, Form()]
 
 
 def _get_or_404(session: Session, catalogue: str) -> Letter:
+    """The letter for a catalogue number from the URL; old zero-padded links such as /viewitem/007 still work."""
     if not catalogue.isdigit():
         raise HTTPException(status_code=400)
-    letter = letters.get(session, catalogue)
+    letter = letters.get(session, int(catalogue))
     if letter is None:
         raise HTTPException(status_code=404)
     return letter
@@ -73,18 +72,18 @@ def finalise_new_letter(request: Request, session: SessionDep, letter_form: Lett
 @router.get("/edit/{catalogue}", response_class=HTMLResponse, dependencies=staff)
 def edititem(request: Request, catalogue: str, session: SessionDep):
     letter = _get_or_404(session, catalogue)
-    context = {"data": letters.as_dict(letter), "original_catalogue": catalogue, "error": None}
+    context = {"data": letters.as_dict(letter), "original_catalogue": letter.catalogue, "error": None}
     return templates.TemplateResponse(request, "letteredit.html", context)
 
 
 @router.post("/finalise_edit/{catalogue}", dependencies=staff)
 def finalise_edit(request: Request, catalogue: str, session: SessionDep, letter_form: LetterFormDep):
-    _get_or_404(session, catalogue)
+    original = _get_or_404(session, catalogue).catalogue
     form = letter_form.model_dump()
     try:
-        letter = letters.update(session, catalogue, form)
+        letter = letters.update(session, original, form)
     except letters.InvalidLetter as e:
-        context = {"data": form, "original_catalogue": catalogue, "error": str(e)}
+        context = {"data": form, "original_catalogue": original, "error": str(e)}
         return templates.TemplateResponse(request, "letteredit.html", context, status_code=400)
     assert letter is not None  # checked by _get_or_404
     return redirect(f"/viewitem/{letter.catalogue}")
@@ -92,6 +91,5 @@ def finalise_edit(request: Request, catalogue: str, session: SessionDep, letter_
 
 @router.post("/delete/{catalogue}", dependencies=staff)
 def delete_letter(catalogue: str, session: SessionDep):
-    _get_or_404(session, catalogue)
-    letters.delete(session, catalogue)
+    letters.delete(session, _get_or_404(session, catalogue).catalogue)
     return redirect("/search")

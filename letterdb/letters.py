@@ -25,9 +25,7 @@ LETTER_FIELDS = (
     "keywords",
     "regions",
     "contents_txt",
-    "filename",
     "imagelink",
-    "published",
     "comments",
     "notes",
 )
@@ -47,62 +45,60 @@ class InvalidLetter(ValueError):
 # Reading
 
 
-def _catalogue_sort_key(catalogue: str) -> tuple[int, int, str]:
-    return (0, int(catalogue), catalogue) if catalogue.isdigit() else (1, 0, catalogue)
-
-
 def all_letters(session: Session) -> list[Letter]:
     """All letters, in catalogue order."""
-    letters = list(session.scalars(select(Letter)))
-    letters.sort(key=lambda letter: _catalogue_sort_key(letter.catalogue))
-    return letters
+    return list(session.scalars(select(Letter).order_by(Letter.catalogue)))
 
 
-def get(session: Session, catalogue: str) -> Letter | None:
+def get(session: Session, catalogue: int) -> Letter | None:
     return session.get(Letter, catalogue)
 
 
-def as_dict(letter: Letter) -> dict[str, str]:
+def as_dict(letter: Letter) -> dict[str, object]:
     """The letter's fields for a template, with NULL columns as empty strings."""
-    return {name: getattr(letter, name) or "" for name in LETTER_FIELDS}
+    data: dict[str, object] = {name: getattr(letter, name) or "" for name in LETTER_FIELDS}
+    data["catalogue"] = letter.catalogue  # 0 is a valid catalogue number
+    return data
 
 
 # Writing
 
 
-def _fields_from_form(form: Mapping[str, object]) -> dict[str, str]:
-    fields = {name: str(form.get(name) or "") for name in LETTER_FIELDS}
-    fields["catalogue"] = fields["catalogue"].strip()
-    if not fields["catalogue"].isdigit():
+def _fields_from_form(form: Mapping[str, object]) -> tuple[int, dict[str, str]]:
+    """The catalogue number and the other text fields."""
+    catalogue = str(form.get("catalogue") or "").strip()
+    if not catalogue.isdigit():
         raise InvalidLetter("Каталожный номер должен состоять из цифр.")
-    return fields
+    fields = {name: str(form.get(name) or "") for name in LETTER_FIELDS if name != "catalogue"}
+    return int(catalogue), fields
 
 
 def create(session: Session, form: Mapping[str, object]) -> Letter:
-    fields = _fields_from_form(form)
-    if get(session, fields["catalogue"]) is not None:
-        raise InvalidLetter(f"Письмо с номером {fields['catalogue']} уже существует.")
-    letter = Letter(**fields)
+    number, fields = _fields_from_form(form)
+    if get(session, number) is not None:
+        raise InvalidLetter(f"Письмо с номером {number} уже существует.")
+    letter = Letter(catalogue=number, **fields)
     session.add(letter)
     session.commit()
     return letter
 
 
-def update(session: Session, catalogue: str, form: Mapping[str, object]) -> Letter | None:
+def update(session: Session, catalogue: int, form: Mapping[str, object]) -> Letter | None:
     """Update a letter; the catalogue number itself may change. Returns None if it does not exist."""
     letter = get(session, catalogue)
     if letter is None:
         return None
-    fields = _fields_from_form(form)
-    if fields["catalogue"] != catalogue and get(session, fields["catalogue"]) is not None:
-        raise InvalidLetter(f"Письмо с номером {fields['catalogue']} уже существует.")
+    number, fields = _fields_from_form(form)
+    if number != catalogue and get(session, number) is not None:
+        raise InvalidLetter(f"Письмо с номером {number} уже существует.")
+    letter.catalogue = number
     for name, value in fields.items():
         setattr(letter, name, value)
     session.commit()
     return letter
 
 
-def delete(session: Session, catalogue: str) -> bool:
+def delete(session: Session, catalogue: int) -> bool:
     letter = get(session, catalogue)
     if letter is None:
         return False
