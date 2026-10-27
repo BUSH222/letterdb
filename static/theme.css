@@ -1,0 +1,153 @@
+/* Obruchev letters theme on top of Bootstrap 5.3
+   Palette lives in :root; everything else is a handful of small components. */
+:root {
+  --ob-paper: #f6ecd2;      /* parchment bands, footer */
+  --ob-paper-alt: #efe2bd;  /* striped rows */
+  --ob-paper-deep: #e6d3a0; /* hovered rows */
+  --ob-cream: #fbf4e0;      /* inputs, text on dark */
+  --ob-ink: #2b2118;
+  --ob-brown: #796148;      /* navbar */
+  --ob-brown-dark: #54432f;
+  --ob-gold: #e9cf8a;
+  --ob-gold-hover: #f3dfa5;
+  --ob-gold-edge: #b9954a;
+  --ob-table-head: #7c5a22;
+  --ob-rule: #cdb98c;
+  --ob-field-edge: #8a7650;
+
+  /* Bootstrap variables */
+  --bs-body-bg: #fff;
+  --bs-body-color: var(--ob-ink);
+  --bs-body-font-family: Arial, Helvetica, sans-serif;
+  --bs-border-color: var(--ob-rule);
+  --bs-link-color-rgb: 122, 75, 30;
+  --bs-link-hover-color-rgb: 165, 96, 31;
+}
+
+/* Headings use the Segoe stack */
+h1, h2, h3, h4, h5, h6 { font-family: Segoe, "Segoe UI", "Helvetica Neue", sans-serif; }
+
+/* ---- Layout helpers ---- */
+.ob-page { padding-left: 10%; padding-right: 10%; }          /* 10% gutters on every public page */
+.bg-paper { background-color: var(--ob-paper) !important; }
+.text-cream { color: var(--ob-cream) !important; }
+.border-gold { border-color: var(--ob-gold-edge) !important; }
+.border-dashed { border-style: dashed !important; }
+.pre-wrap { white-space: pre-wrap; }
+.col-fit { width: 1%; white-space: nowrap; }
+
+/* ---- Banner ---- */
+.ob-banner {
+  min-height: 91px;
+  background: var(--ob-paper) url(rc_images/banner.jpg) center / cover;
+}
+.ob-banner-lg { min-height: 201px; background-position: top center; }
+
+/* ---- Navbar ---- */
+.navbar.ob-navbar {
+  background-color: var(--ob-brown);
+  padding: 0;
+  font-weight: bold;
+  --bs-navbar-color: var(--ob-cream);
+  --bs-navbar-hover-color: var(--ob-ink);
+  --bs-navbar-active-color: var(--ob-ink);
+  --bs-navbar-nav-link-padding-x: 1.25rem;
+  --bs-navbar-padding-y: 0;
+}
+.ob-navbar .nav-link { padding-top: .7rem; padding-bottom: .7rem; }
+.ob-navbar .nav-link:hover,
+.ob-navbar .nav-link.show { background-color: var(--ob-paper); color: var(--ob-ink); }
+.ob-navbar .nav-link.active { background-color: var(--ob-gold); color: var(--ob-ink); }
+.ob-navbar .dropdown-menu {
+  --bs-dropdown-bg: var(--ob-brown);
+  --bs-dropdown-border-width: 0;
+  --bs-dropdown-border-radius: 0;
+  --bs-dropdown-link-color: var(--ob-cream);
+  --bs-dropdown-link-hover-color: var(--ob-ink);
+  --bs-dropdown-link-hover-bg: var(--ob-paper);
+  --bs-dropdown-link-active-color: var(--ob-ink);
+  --bs-dropdown-link-active-bg: var(--ob-gold);
+  --bs-dropdown-padding-y: 0;
+  --bs-dropdown-min-width: 14rem;
+  font-weight: bold;
+}
+.ob-navbar .dropdown-item { padding: .6rem 1.25rem; }
+
+/* ---- Footer ---- */
+.ob-footer {
+  background-color: var(--ob-paper);
+  border-top: 1px solid var(--ob-rule);
+  font-size: 11pt;
+}
+
+/* ---- Buttons (gold variant) ---- */
+.btn-gold {
+  --bs-btn-color: var(--ob-ink);
+  --bs-btn-bg: var(--ob-gold);
+  --bs-btn-border-color: var(--ob-gold-edge);
+  --bs-btn-hover-color: var(--ob-ink);
+  --bs-btn-hover-bg: var(--ob-gold-hover);
+  --bs-btn-hover-border-color: var(--ob-gold-edge);
+  --bs-btn-active-color: var(--ob-ink);
+  --bs-btn-active-bg: #dcc178;
+  --bs-btn-active-border-color: var(--ob-gold-edge);
+  --bs-btn-focus-shadow-rgb: 185, 149, 74;
+}
+.ob-icon-btn { width: 2.25rem; height: 2.25rem; padding: 0; }
+
+/* ---- Forms ---- */
+.form-control {
+  background-color: var(--ob-cream);
+  border-color: var(--ob-field-edge);
+}
+.form-control:focus {
+  background-color: var(--ob-cream);
+  border-color: var(--ob-gold-edge);
+  box-shadow: 0 0 0 .25rem rgba(185, 149, 74, .3);
+}
+
+/* ---- Tables ---- */
+.table {
+  --bs-table-striped-bg: var(--ob-paper-alt);
+  --bs-table-hover-bg: var(--ob-paper-deep);
+  --bs-table-border-color: var(--ob-rule);
+}
+.table-brown {
+  --bs-table-color: var(--ob-cream);
+  --bs-table-bg: var(--ob-table-head);
+  --bs-table-border-color: var(--ob-table-head);
+  --bs-table-striped-bg: var(--ob-table-head);
+  --bs-table-striped-color: var(--ob-cream);
+  --bs-table-hover-bg: var(--ob-table-head);
+  --bs-table-hover-color: var(--ob-cream);
+}
+
+/* ---- Cards (letter text boxes) ---- */
+.card { --bs-card-border-width: 0; }
+
+/* ---- Catalogue lists: columns that flow top-to-bottom ---- */
+.ob-cols { column-width: 300px; column-gap: 2.5rem; }
+.ob-cols > li { break-inside: avoid; }
+.ob-years { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); column-gap: 1.5rem; }
+
+/* ---- Letter forms (new/edit): white fields ---- */
+.letter-form .form-control,
+.letter-form .form-control:focus { background-color: #fff; }
+
+/* ---- Tag inputs (keywords / regions on the staff forms, see static/tag_input.js) ---- */
+.tag-results {
+  max-height: 16rem; overflow-y: auto;
+  --bs-dropdown-bg: #fff;
+  --bs-dropdown-border-color: var(--ob-field-edge);
+  --bs-dropdown-link-color: var(--ob-ink);
+  --bs-dropdown-link-hover-color: var(--ob-ink);
+  --bs-dropdown-link-hover-bg: var(--ob-paper-deep);
+  --bs-dropdown-link-active-color: var(--ob-ink);
+  --bs-dropdown-link-active-bg: var(--ob-paper-deep);
+}
+.tag-results .dropdown-item { white-space: normal; }
+.tag-list {
+  --bs-list-group-bg: #fff;
+  --bs-list-group-border-color: var(--ob-field-edge);
+}
+.tag-list:empty { display: none; }

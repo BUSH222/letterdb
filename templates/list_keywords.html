@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Список: ключевые слова{% endblock %}
+{% block banner_title %}Списки писем{% endblock %}
+
+{% block content %}
+<div class="ob-page py-4">
+  <h2 class="h3 fw-bold text-black mt-3 mb-1">Ключевые слова</h2>
+  <p class="mb-4">Найдено {{ total }} результатов</p>
+  <ul class="list-unstyled ob-cols mb-0">
+    {% for name, n in items %}
+    <li class="d-flex justify-content-between gap-3 py-2 border-bottom"><a href="/search?keyword={{ name|urlencode }}">{{ name }}</a><span>{{ n }}</span></li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

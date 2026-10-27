@@ -1,153 +1,47 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
+{% block title %}Просмотр письма{% endblock %}
+{% block banner_title %}Письмо В.А. Обручева{% endblock %}
 
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="generator" content="RocketCake">
-	<title></title>
-	<link rel="stylesheet" type="text/css" href="/static/letterview_html.css">
-</head>
-
-<body>
-	<div class="textstyle1">
-		<span class="textstyle2"></span>
-	</div>
-	<div class="textstyle3">
-		<div id="container_1809c9fc">
-			<div id="container_1809c9fc_padding">
-				<div class="textstyle3"> <span class="textstyle4"><br /></span>
-					<h1 id="heading_60dba8b2">Письмо В.А. Обручева</h1>
-				</div>
-				<div style="clear:both"></div>
-			</div>
-		</div>
-		<div id="container_274cbdb6">
-			<div id="container_274cbdb6_padding">
-				<div class="textstyle3">
-					<div id="menu_526a9cdd">
-						<div class="menuholder1"><a href="javascript:void(0);">
-								<div id="menuentry_5ad1743c" class="menustyle1 menu_526a9cdd_mainMenuEntry mobileEntry">
-									<div class="menuentry_text1">
-										<span class="textstyle5">Menu ▼</span>
-									</div>
-								</div>
-							</a>
-							<a href="/search" style="text-decoration:none">
-								<div id="menuentry_24b03f36" class="menustyle1 menu_526a9cdd_mainMenuEntry normalEntry">
-									<div class="menuentry_text2">
-										<span class="textstyle6">Поиск</span>
-									</div>
-								</div>
-							</a>
-							<a href="/" style="text-decoration:none">
-								<div id="menuentry_5d96740" class="menustyle2 menu_526a9cdd_mainMenuEntry normalEntry">
-									<div class="menuentry_text2">
-										<span class="textstyle6">ИС</span>
-									</div>
-								</div>
-							</a>
-							<a href="/about" style="text-decoration:none">
-								<div id="menuentry_7cc28000" class="menustyle3 menu_526a9cdd_mainMenuEntry normalEntry">
-									<div class="menuentry_text2">
-										<span class="textstyle6">О письмах</span>
-									</div>
-								</div>
-							</a>
-
-							<script type="text/javascript" src="/rc_images/wsp_menu.js"></script>
-							<script type="text/javascript">
-								var js_menu_526a9cdd = new wsp_menu('menu_526a9cdd', 'menu_526a9cdd', 10, null, true);
-
-								js_menu_526a9cdd.createMenuForItem('menuentry_5ad1743c', ["      <span class=\"textstyle7\">Поиск</span> ", 'search.htm', '',
-									"      <span class=\"textstyle7\">Каталог</span> ", 'about.html', '',
-									"      <span class=\"textstyle7\">О письмах</span> ", 'about.html', '']);
-								js_menu_526a9cdd.createMenuForItem('menuentry_24b03f36', []);
-								js_menu_526a9cdd.createMenuForItem('menuentry_5d96740', []);
-								js_menu_526a9cdd.createMenuForItem('menuentry_7cc28000', []);
-
-							</script>
-						</div>
-					</div>
-				</div>
-
-				<div style="clear:both"></div>
-			</div>
-		</div>
-		<div id="container_6036d6">
-			<div id="container_6036d6_padding">
-				<div class="textstyle3"><span class="textstyle8">
-					<button onclick="location.href='/edit/{{data.catalogue}}'" {{ hidden }}>Edit</button>
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-					<button onclick="location.href='/delete/{{data.catalogue}}'" {{ hidden }}>[DELETE]</button>
-					<br/>{{ data.addressee }}</span><span class="textstyle9"><br /></span><span class="textstyle10">
-						{{ data.date }}<br /></span></div>
-				<div class="textstyle1"><span class="textstyle11"><br /></span></div>
-			</div>
-		</div><span class="textstyle2"><br /></span>
-		
-		<div id="container_36175d75">
-			<br><br>
-			<div class="textstyle3"><span class="textstyle10"><h2>Текст Письма</h2><br /></span>
-				<div id="container_17c6ed17">
-					
-					<div id="container_17c6ed17_padding">
-						<div class="textstyle1" style="white-space: pre-wrap;"> {{ data.contents_txt | safe}} </div>
-					</div>
-				</div><span class="textstyle10"><br /></span><span class="textstyle12"><br /><br /></span>
-			</div>
-		</div><span class="textstyle2"><br /></span>
-		
-		<div id="container_36175d75">
-			
-			<div class="textstyle3"><span class="textstyle10"><h2>Комментарии получателя письма</h2><br /></span>
-				<div id="container_17c6ed17">
-					<div id="container_17c6ed17_padding">
-						<div class="textstyle1" style="white-space: pre-wrap;"> {{ data.comments|safe }} </div>
-					</div>
-				</div><span class="textstyle10"><br /></span><span class="textstyle12"><br /><br /></span>
-			</div>
-		</div><span class="textstyle2"><br /></span>
-		
-		<div id="container_36175d75">
-			
-			<div class="textstyle3"><span class="textstyle10"><h2> Примечания составителей</h2><br /></span>
-				<div id="container_17c6ed17">
-					<div id="container_17c6ed17_padding">
-						<div class="textstyle1" style="white-space: pre-wrap;"> {{ data.notes | safe }} </div>
-					</div>
-				</div><span class="textstyle10"><br /></span><span class="textstyle12"><br /></span>
-			</div>
-		</div><span class="textstyle2"><br /></span>
-		<div id="container_7a6e5f84">
-			<div class="textstyle3"><span class="textstyle10"><br /><br /></span>
-				<div id="container_75690335">
-					<div id="container_75690335_padding">
-						<div class="textstyle1">
-							<ul id="ul_1287e519" class="ulstyle1">
-								<li><span class="textstyle13"><b>Опубликован:</b> {{ data.published }}</span></li>
-								<br>
-								<li><span class="textstyle13"><b>Ключевые слова:</b> {{ data.keywords }}</span></li>
-								<br>
-								<li><span class="textstyle13"><b>Регион:</b> {{ data.regions }}</span></li>
-								<li><span class="textstyle13"><b>ID:</b> {{ data.catalogue }}</span></li>
-							</ul>
-							<span class="textstyle13"> <br /></span>
-						</div>
-
-						<div style="clear:both"></div>
-					</div>
-				</div><span class="textstyle10"><br /></span><span class="textstyle12"><br /></span>
-			</div>
-		</div>
-	</div>
-	<br><br>
-	<div style="text-align: center;" class="textstyle4">
-		<br>
-		<h1>Скан письма</h1>
-		<br>
-		{{data.imagelink|safe}}
-	</div> <br><br>
-</body>
-
-</html>
+{% block content %}
+<section class="ob-page py-3">
+  {% if authenticated %}
+  <div class="d-flex gap-4 mb-3">
+    <a class="btn btn-gold btn-sm" href="/edit/{{ data.catalogue }}">Edit</a>
+    <form method="post" action="/delete/{{ data.catalogue }}" onsubmit="return confirm('Удалить письмо {{ data.catalogue }}?')">
+      <button type="submit" class="btn btn-gold btn-sm">[DELETE]</button>
+    </form>
+  </div>
+  {% endif %}
+  <p class="fs-5 mb-1">{{ data.addressee }}</p>
+  <p class="mb-0">{{ data.date }}</p>
+</section>
+<section class="bg-paper py-4">
+  <div class="ob-page">
+    <h2 class="h4 mb-3">Текст Письма</h2>
+    <div class="card"><div class="card-body pre-wrap">{{ data.contents_txt | safe }}</div></div>
+  </div>
+</section>
+<section class="bg-paper py-4">
+  <div class="ob-page">
+    <h2 class="h4 mb-3">Комментарии получателя письма</h2>
+    <div class="card"><div class="card-body pre-wrap">{{ data.comments | safe }}</div></div>
+  </div>
+</section>
+<section class="bg-paper py-4">
+  <div class="ob-page">
+    <h2 class="h4 mb-3">Примечания составителей</h2>
+    <div class="card"><div class="card-body pre-wrap">{{ data.notes | safe }}</div></div>
+  </div>
+</section>
+<section class="ob-page py-4">
+  <ul class="list-unstyled mb-0">
+    <li class="mb-3"><b>Ключевые слова:</b> {% for t in data.keywords %}<a href="/search?keyword={{ t|urlencode }}">{{ t }}</a>{{ ", " if not loop.last }}{% endfor %}</li>
+    <li class="mb-1"><b>Регион:</b> {% for t in data.regions %}<a href="/search?region={{ t|urlencode }}">{{ t }}</a>{{ ", " if not loop.last }}{% endfor %}</li>
+    <li><b>ID:</b> {{ data.catalogue }}</li>
+  </ul>
+</section>
+<section class="text-center py-5">
+  <h2 class="h1 fw-bold mb-4">Скан письма</h2>
+  {{ data.imagelink | safe }}
+</section>
+{% endblock %}

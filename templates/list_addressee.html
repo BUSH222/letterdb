@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Список: адресаты{% endblock %}
+{% block banner_title %}Списки писем{% endblock %}
+
+{% block content %}
+<div class="ob-page py-4">
+  <h2 class="h3 fw-bold text-black mt-3 mb-1">Адресаты</h2>
+  <p class="mb-4">Найдено {{ total }} результатов</p>
+  {% for letter, people in groups %}
+  <section class="mb-2">
+    <h3 class="h4 fw-bold text-black pb-1 mt-4 mb-2 border-bottom border-2 border-gold">{{ letter }}</h3>
+    <ul class="list-unstyled ob-cols mb-0">
+      {% for name, n in people %}
+      <li class="d-flex justify-content-between gap-3 py-2 border-bottom"><a href="/search?addressee={{ name|urlencode }}">{{ name }}</a><span>{{ n }}</span></li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

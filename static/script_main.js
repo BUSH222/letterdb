@@ -13,8 +13,9 @@ function sortTable(n) {
         var aValue = a.cells[n].innerText || a.cells[n].textContent;
         var bValue = b.cells[n].innerText || b.cells[n].textContent;
 
-        
-        return sortAscending ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+        // numeric: true sorts catalogue numbers as numbers (2 before 10)
+        var order = aValue.localeCompare(bValue, "ru", { numeric: true });
+        return sortAscending ? order : -order;
 
     });
 

@@ -1,168 +1,82 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
+{% block title %}Поиск по письмам{% endblock %}
+{% block banner_title %}Поиск по письмам{% endblock %}
 
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="generator" content="RocketCake">
-	<title></title>
-	<link rel="stylesheet" type="text/css" href="static/search_html.css">
-</head>
+{% block content %}
+<section class="ob-page pt-4">
+  <div class="d-flex align-items-center gap-3 mb-2">
+    <h2 class="h4 fw-bold text-black mb-0">Поиск по писем В.А. Обручева</h2>
+    {% if authenticated %}<a class="btn btn-gold btn-sm" href="/newletter">New record</a>{% endif %}
+  </div>
+  <ul class="mb-4">
+    <li>Поиск по письмам можно осуществлять по содержимому письма, по адресату, а также по комментариям и примечаниям</li>
+    <li>Достаточно ввести слово или его часть: совпадения ищутся в любом месте текста</li>
+    <li>Регистр не учитывается, а буква «ё» автоматически заменяется на «е»</li>
+    <li>Ниже представлен каталог писем, который можно сортировать по столбцам</li>
+  </ul>
+  {% if active_filter %}
+  <div class="d-flex justify-content-center mb-4">
+    <div class="d-inline-flex align-items-center gap-2 bg-paper border border-gold rounded-pill ps-3 pe-1 py-1" role="status">
+      <span>Фильтр: {{ active_filter.label }} </span>
+      <span class="fw-bold">{{ active_filter.value }}</span>
+      <a class="btn btn-gold rounded-circle ob-icon-btn d-inline-flex align-items-center justify-content-center" href="/search" aria-label="Убрать фильтр"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></a>
+    </div>
+  </div>
+  {% endif %}
+  <form action="/search" method="post" autocomplete="off">
+    <table class="table table-borderless text-center align-middle mb-4">
+      <thead>
+        <tr>
+          <th scope="col"><label for="contents">Поиск по содержимому письма</label></th>
+          <th scope="col"><label for="addressee">Поиск по адресату</label></th>
+          <th scope="col"><label for="comments_notes">Поиск по комментариям и примечаниям</label></th>
+          <th scope="col" class="col-fit">Поиск</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input type="text" class="form-control" id="contents" name="contents"></td>
+          <td><input type="text" class="form-control" id="addressee" name="addressee"></td>
+          <td><input type="text" class="form-control" id="comments_notes" name="comments_notes"></td>
+          <td><input type="submit" class="btn btn-gold" value="Поиск"></td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+</section>
+<section class="ob-page pb-5">
+  <div class="table-responsive">
+    <table id="MainTable" class="table table-striped table-hover table-bordered align-middle mb-0">
+      <thead class="table-brown">
+        <tr>
+          <th scope="col" role="button" class="col-fit" onclick="sortTable(0)">№</th>
+          <th scope="col" role="button" class="col-fit" onclick="sortTable(1)">Дата</th>
+          <th scope="col" role="button" onclick="sortTable(2)">Адресат</th>
+          <th scope="col">Ключевые слова</th>
+          <th scope="col">Регионы</th>
+          <th scope="col" class="col-fit">Содержание</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in data %}
+        <tr>
+          <td>{{ item.catalogue }}</td>
+          <td class="fw-bold">{{ item.date }}</td>
+          <td><a href="/search?addressee={{ item.addressee|urlencode }}">{{ item.addressee }}</a></td>
+          <td>{% for t in item.keywords %}<a href="/search?keyword={{ t|urlencode }}">{{ t }}</a>{{ ", " if not loop.last }}{% endfor %}</td>
+          <td>{% for t in item.regions %}<a href="/search?region={{ t|urlencode }}">{{ t }}</a>{{ ", " if not loop.last }}{% endfor %}</td>
+          <td><a class="btn btn-gold btn-sm d-inline-flex align-items-center gap-2" href="/viewitem/{{ item.catalogue }}" target="_blank"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg>Открыть</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% if not data %}
+<h2 class="h3 text-center pb-5">Не найдено</h2>
+{% endif %}
+{% endblock %}
 
-<body>
-	<div class="textstyle1">
-		<div id="container_121cac33">
-			<div id="container_121cac33_padding">
-				<br>
-				<h1 id="heading_6779c72">Поиск по письмам</h1>
-			</div>
-			<div style="clear:both"></div>
-		</div>
-	</div>
-	</div>
-	<div class="textstyle3">
-		<div id="container_1ee20c64">
-			<div id="container_1ee20c64_padding">
-				<div class="textstyle1">
-					<div id="menu_733ed3e1">
-						<div class="menuholder1"><a href="javascript:void(0);">
-								<div id="menuentry_1f3203a9" class="menustyle1 menu_733ed3e1_mainMenuEntry mobileEntry">
-									<div class="menuentry_text1">
-										<span class="textstyle4">Menu ▼</span>
-									</div>
-								</div>
-							</a>
-							<a href="about" style="text-decoration:none">
-								<div id="menuentry_22f9d2c5" class="menustyle1 menu_733ed3e1_mainMenuEntry normalEntry">
-									<div class="menuentry_text2">
-										<span class="textstyle5">О письмах</span>
-									</div>
-								</div>
-							</a>
-							<a href="/" style="text-decoration:none">
-								<div id="menuentry_13002dc2" class="menustyle2 menu_733ed3e1_mainMenuEntry normalEntry">
-									<div class="menuentry_text2">
-										<span class="textstyle5">ИС</span>
-									</div>
-								</div>
-							</a>
-							<a href="contact" style="text-decoration:none">
-								<div id="menuentry_5aa64af4" class="menustyle3 menu_733ed3e1_mainMenuEntry normalEntry">
-									<div class="menuentry_text2">
-										<span class="textstyle5">Контакты</span>
-									</div>
-								</div>
-							</a>
-
-							<script type="text/javascript" src="rc_images/wsp_menu.js"></script>
-							<script type="text/javascript">
-								var js_menu_733ed3e1 = new wsp_menu('menu_733ed3e1', 'menu_733ed3e1', 10, null, true);
-
-								js_menu_733ed3e1.createMenuForItem('menuentry_1f3203a9', ["      <span class=\"textstyle6\">О письмах</span> ", 'index.html', '',
-									"      <span class=\"textstyle6\">Каталог</span> ", 'about.html', '',
-									"      <span class=\"textstyle6\">Контакты</span> ", 'contact.html', '']);
-								js_menu_733ed3e1.createMenuForItem('menuentry_22f9d2c5', []);
-								js_menu_733ed3e1.createMenuForItem('menuentry_13002dc2', []);
-								js_menu_733ed3e1.createMenuForItem('menuentry_5aa64af4', []);
-
-							</script>
-						</div>
-					</div>
-				</div>
-				<div style="clear:both"></div>
-			</div>
-		</div>
-	</div>
-	<div class="textstyle1">
-		<div id="container_29ee7549">
-			<div id="container_29ee7549_padding">
-				<div class="textstyle3"><span class="textstyle7">Поиск по писем В.А. Обручева</span>
-					{% if current_user.is_authenticated %} <button onclick="location.href='/newletter'">New record</button> {% endif %}
-						<span class="textstyle8"><br /></span>
-					<ul id="ul_7b56f8c2" class="ulstyle1">
-						<li><span class="textstyle8">Поиск по письмам можно осуществлять по разным параметрам и в
-								текстах писем</span></li>
-						<li><span class="textstyle8">Ниже представлен каталог писем, который можно сортировать по
-								столбцам</span></li>
-						<li><span class="textstyle8">Для быстрого поиска наберите *слово*</span></li>
-					</ul>
-					</ul>
-					<span class="textstyle8"> <br /><br /></span>
-				</div>
-
-			</div>
-		</div>
-	</div>
-	<div class="textstyle3">
-		<span class="textstyle10"></span>
-	</div>
-
-	<table class="searchTable">
-		<thead>
-			<tr>
-				<th style="width:10%">№ письма</th>
-				<th style="width:10%">Дата</th>
-				<th colspan="2">Адресат</th>
-				<th>Ключевые слова</th>
-				<th>Регионы</th>
-				<th style="width:5%">Поиск</th>
-			</tr>
-		</thead>
-		<tbody>
-			<form action="/search" method="post" autocomplete="off">
-				<tr>
-					<td><input type="text" id="catalogue" name="catalogue"></td>
-					<td><input type="text" id="date" name="date"></td>
-					<td colspan="2"><input type="text" id="addressee" name="addressee"></td>
-					<td><input type="text" id="keywords" name="keywords"></td>
-					<td><input type="text" id="regions" name="regions"></td>
-					<td><input type="submit" value="Поиск"></button></td>
-				</tr>
-				<tr>
-					<td>Не учитывать регистр: <input type="checkbox" id="case-sensitive" name="case-sensitive" checked>
-					</td>
-					<td>Использовать RegEx: <input type="checkbox" id="use-regex" name="use-regex"></td>
-					<td>Заменить ё <input type="checkbox" id="replace-e" name="replace-e" checked></td>
-					<td>Опубликовано <input type="checkbox" id="published" name="published"></td>
-					<td colspan="3">Поиск по содержимому письма: <input type="text" id="contents" name="contents"></td>
-			</form>
-			</tr>
-
-		</tbody>
-
-	</table>
-	<table id="MainTable" class="table">
-		<thead>
-			<tr>
-				<th onclick="sortTable(0)" style="width:4%">
-					<centrе>№</centr>
-				</th>
-				<th onclick="sortTable(1)" style="width:10%">Дата</th>
-				<th onclick="sortTable(2)">Адресат</th>
-				<th>Ключевые слова</th>
-				<th>Регионы</th>
-				<th style="width:5%">Содержание</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for item in data %}
-			<tr>
-				<td>{{item.catalogue}}</td>
-				<td>
-					<centrе><b>{{item.date}}</b></centrе>
-				</td>
-				<td>{{item.addressee}}</td>
-				<td>{{item.keywords}}</td>
-				<td>{{item.regions}}</td>
-				<td><button onclick="window.open('viewitem/{{item.catalogue}}', '_blank')">Посмотреть содержание</button></td>
-			</tr>
-			{% endfor %}
-		</tbody>
-	</table>
-	<br><br>
-	<h1 style="text-align:center" {{notfoundhidden | safe}}>Не найдено</h1>
-	<h2 style="text-align:center" {{notfoundhidden | safe}}>(Попробуйте ввести *слово*)</h2>
-	<script src="static/script_main.js"></script>
-</body>
-
-</html>
+{% block scripts %}
+<script src="/static/script_main.js"></script>
+{% endblock %}
