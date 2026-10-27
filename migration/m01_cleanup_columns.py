@@ -8,7 +8,7 @@
 - Trailing dots are stripped from `date` ('1946.04.' -> '1946.04').
 """
 
-from typing import Any
+from typing import Any, Dict, Optional
 
 from sqlalchemy import Column, Integer, MetaData, Table, Text, select, text
 
@@ -18,12 +18,12 @@ from migration import backup_sqlite, columns
 KEPT_COLUMNS = ("date", "adressee", "keywords", "regions", "contents_txt", "imagelink", "comments", "notes")
 
 
-def append(comments: str | None, extra: str) -> str:
+def append(comments: Optional[str], extra: str) -> str:
     comments = (comments or "").rstrip()
     return f"{comments}\n\n{extra}" if comments else extra
 
 
-def clean_row(row: dict[str, Any]) -> dict[str, Any]:
+def clean_row(row: Dict[str, Any]) -> Dict[str, Any]:
     comments = row["comments"]
 
     filename = (row["filename"] or "").strip()

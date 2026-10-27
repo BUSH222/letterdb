@@ -16,6 +16,33 @@ This repository contains the source code for LetterDB, a web application that al
 5) Run the application using `uv run app.py` (or `uv run uvicorn app:app --reload` for development).
 This serves plain HTTP on 127.0.0.1:8000; put it behind a TLS-terminating server for release.
 
+## Python version
+This branch targets Python 3.8 (pinned to 3.8.17 in `.python-version`) so it can run on hosting that only has 3.8.
+Write code that 3.8 can run: `Optional[X]` / `List[X]` from `typing` instead of `X | None` / `list[X]`
+(FastAPI, Pydantic and SQLAlchemy read annotations at runtime), and `Annotated` from `typing_extensions`.
+
+## Deploying with Apache (mod_wsgi)
+`wsgi.py` wraps the app with `a2wsgi` and exposes it as `application`. It also creates missing tables at startup,
+because a2wsgi does not run FastAPI's lifespan.
+1) Copy the project to the server (e.g. `~/letterdb`) and install the dependencies with the server's own Python 3.8,
+   which mod_wsgi runs on: `UV_PYTHON_PREFERENCE=only-system uv sync --no-dev`
+2) Run `uv run manager.py quick_setup --email=<email>` once. A fixed `SECRET_KEY` in `.env` is required: Apache runs
+   several processes, and without it each one signs session cookies with its own random key, so logins break.
+3) Point the site's `.wsgi` file at the project:
+    ```python
+    import os, site, sys
+
+    PROJECT = os.path.expanduser("~<username>/letterdb")  # "~/" may not work: Apache may not set HOME
+    site.addsitedir(os.path.join(PROJECT, ".venv/lib/python3.8/site-packages"))
+    sys.path.insert(0, PROJECT)
+
+    from wsgi import application
+    ```
+
+Templates, static files, `.env` and the default SQLite database are found relative to the project folder, so the
+working directory does not matter. A relative SQLite `DATABASE_URL` set in `.env` is still relative to it, so use an
+absolute path there.
+
 ## Database
 The app uses SQLAlchemy. The database is set by `DATABASE_URL` (in the environment or `.env`) and defaults to `sqlite:///maindb.db`.
 To use another database, install its driver and point `DATABASE_URL` at it:

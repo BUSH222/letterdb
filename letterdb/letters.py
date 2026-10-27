@@ -7,18 +7,15 @@ With a few hundred letters and a few thousand keywords this is cheap.
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from itertools import groupby
-from typing import TYPE_CHECKING
+from typing import Callable, DefaultDict, Dict, Iterable, List, Mapping, Optional, Tuple, Type, Union
+from typing import Counter as CounterT
 
 from sqlalchemy import delete as sql_delete
 from sqlalchemy import func, select
+from sqlalchemy.orm import Session
 
 from letterdb.models import Keyword, Letter, LetterKeyword, LetterRegion, Region
 from letterdb.text import extract_year, fold, normalise_name, word_start_rank
-
-if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Mapping
-
-    from sqlalchemy.orm import Session
 
 TEXT_FIELDS = ("date", "addressee", "contents_txt", "imagelink", "comments", "notes")
 SINGLE_LINE_FIELDS = ("date", "addressee")
@@ -35,8 +32,8 @@ FILTER_LABELS = {
 class TermKind:
     """Keywords and regions work the same way: a table of terms, linked to letters."""
 
-    model: type[Keyword] | type[Region]
-    link: type[LetterKeyword] | type[LetterRegion]
+    model: Union[Type[Keyword], Type[Region]]
+    link: Union[Type[LetterKeyword], Type[LetterRegion]]
     links_attr: str  # Letter.keyword_links / Letter.region_links
     field: str  # Letter.keywords / Letter.regions, and the form field
 
@@ -54,12 +51,12 @@ class InvalidLetter(ValueError):
 # Reading
 
 
-def all_letters(session: Session) -> list[Letter]:
+def all_letters(session: Session) -> List[Letter]:
     """All letters, in catalogue order."""
     return list(session.scalars(select(Letter).order_by(Letter.catalogue)))
 
 
-def get(session: Session, catalogue: int) -> Letter | None:
+def get(session: Session, catalogue: int) -> Optional[Letter]:
     return session.get(Letter, catalogue)
 
 
@@ -69,16 +66,16 @@ def next_catalogue(session: Session) -> int:
     return 0 if highest is None else highest + 1
 
 
-def as_dict(letter: Letter) -> dict[str, object]:
+def as_dict(letter: Letter) -> Dict[str, object]:
     """The letter's fields for a template, with NULL columns as empty strings."""
-    data: dict[str, object] = {name: getattr(letter, name) or "" for name in TEXT_FIELDS}
+    data: Dict[str, object] = {name: getattr(letter, name) or "" for name in TEXT_FIELDS}
     data["catalogue"] = letter.catalogue
     data["keywords"] = letter.keywords
     data["regions"] = letter.regions
     return data
 
 
-def suggest_terms(session: Session, kind: str, query: str) -> list[str]:
+def suggest_terms(session: Session, kind: str, query: str) -> List[str]:
     """Keywords or regions with a word starting with `query` (case-insensitive, ё = е).
 
     Terms that start with the query come first, then the rest; each group alphabetically.
@@ -91,7 +88,7 @@ def suggest_terms(session: Session, kind: str, query: str) -> list[str]:
 # Writing
 
 
-def _fields_from_form(form: Mapping[str, object]) -> tuple[int, dict[str, str]]:
+def _fields_from_form(form: Mapping[str, object]) -> Tuple[int, Dict[str, str]]:
     """The catalogue number and the text fields."""
     catalogue = str(form.get("catalogue") or "").strip()
     if not catalogue.isdigit():
@@ -102,9 +99,9 @@ def _fields_from_form(form: Mapping[str, object]) -> tuple[int, dict[str, str]]:
     return int(catalogue), fields
 
 
-def _form_terms(form: Mapping[str, object], kind: TermKind) -> list[str]:
+def _form_terms(form: Mapping[str, object], kind: TermKind) -> List[str]:
     value = form.get(kind.field) or []
-    return [str(name) for name in value] if isinstance(value, list | tuple) else [str(value)]
+    return [str(name) for name in value] if isinstance(value, (list, tuple)) else [str(value)]
 
 
 def _set_terms(session: Session, letter: Letter, kind: TermKind, names: Iterable[str]) -> None:
@@ -146,7 +143,7 @@ def create(session: Session, form: Mapping[str, object]) -> Letter:
     return letter
 
 
-def update(session: Session, catalogue: int, form: Mapping[str, object]) -> Letter | None:
+def update(session: Session, catalogue: int, form: Mapping[str, object]) -> Optional[Letter]:
     """Update a letter; the catalogue number itself may change. Returns None if it does not exist."""
     letter = get(session, catalogue)
     if letter is None:
@@ -182,9 +179,9 @@ def delete(session: Session, catalogue: int) -> bool:
 
 def search(
     letters: Iterable[Letter], contents: str = "", addressee: str = "", comments_notes: str = ""
-) -> list[Letter]:
+) -> List[Letter]:
     """Substring search, case-insensitive with ё = е. Every non-empty field has to match."""
-    checks: list[tuple[str, Callable[[Letter], str]]] = [
+    checks: List[Tuple[str, Callable[[Letter], str]]] = [
         (fold(contents.strip()), lambda letter: fold(letter.contents_txt)),
         (fold(addressee.strip()), lambda letter: fold(letter.addressee)),
         (fold(comments_notes.strip()), lambda letter: fold(letter.comments) + "\n" + fold(letter.notes)),
@@ -193,7 +190,7 @@ def search(
     return [letter for letter in letters if all(needle in haystack(letter) for needle, haystack in checks)]
 
 
-def filter_by(letters: Iterable[Letter], kind: str, value: str) -> list[Letter]:
+def filter_by(letters: Iterable[Letter], kind: str, value: str) -> List[Letter]:
     """Letters matching one catalogue-list filter (see FILTER_LABELS)."""
     if kind == "year":
         if not value.strip().isdigit():
@@ -216,19 +213,19 @@ class _Tally:
     """Counts names, merging spellings that differ only in case or ё/е, and shows the most common one."""
 
     def __init__(self) -> None:
-        self.counts: Counter[str] = Counter()
-        self.spellings: defaultdict[str, Counter[str]] = defaultdict(Counter)
+        self.counts: CounterT[str] = Counter()
+        self.spellings: DefaultDict[str, CounterT[str]] = defaultdict(Counter)
 
     def add(self, name: str) -> None:
         self.counts[fold(name)] += 1
         self.spellings[fold(name)][name] += 1
 
-    def items(self) -> list[tuple[str, int]]:
+    def items(self) -> List[Tuple[str, int]]:
         """(name, count) pairs in alphabetical order."""
         return [(self.spellings[key].most_common(1)[0][0], n) for key, n in sorted(self.counts.items())]
 
 
-def years_by_decade(letters: Iterable[Letter]) -> list[tuple[int, list[tuple[int, int]]]]:
+def years_by_decade(letters: Iterable[Letter]) -> List[Tuple[int, List[Tuple[int, int]]]]:
     """[(1940, [(1942, n), (1943, n), ...]), ...]; letters without a readable year are left out."""
     years = Counter(year for letter in letters if (year := extract_year(letter.date)) is not None)
     return [
@@ -236,7 +233,7 @@ def years_by_decade(letters: Iterable[Letter]) -> list[tuple[int, list[tuple[int
     ]
 
 
-def addressees_by_letter(letters: Iterable[Letter]) -> list[tuple[str, list[tuple[str, int]]]]:
+def addressees_by_letter(letters: Iterable[Letter]) -> List[Tuple[str, List[Tuple[str, int]]]]:
     """[("А", [(name, n), ...]), ...]."""
     tally = _Tally()
     for letter in letters:
@@ -247,7 +244,7 @@ def addressees_by_letter(letters: Iterable[Letter]) -> list[tuple[str, list[tupl
     ]
 
 
-def term_counts(session: Session, kind: str) -> list[tuple[str, int]]:
+def term_counts(session: Session, kind: str) -> List[Tuple[str, int]]:
     """[(term, number of letters), ...] for 'keyword' or 'region'.
 
     Most frequent first; terms with the same count in alphabetical order.

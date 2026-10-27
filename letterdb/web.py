@@ -1,29 +1,31 @@
 """Shared pieces of the web layer: templates and request dependencies."""
 
-from typing import Annotated
+from typing import Optional
 
 from fastapi import Depends, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
+from typing_extensions import Annotated
 
 from letterdb import users
+from letterdb.config import TEMPLATES_DIR
 from letterdb.db import get_session
 from letterdb.models import User
 
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory=TEMPLATES_DIR)
 templates.env.finalize = lambda value: "" if value is None else value  # NULL columns render as empty
 
 SessionDep = Annotated[Session, Depends(get_session)]
 
 
-def get_current_user(request: Request, session: SessionDep) -> User | None:
+def get_current_user(request: Request, session: SessionDep) -> Optional[User]:
     """The logged in user, if any. Their id is kept in a signed session cookie."""
     user_id = request.session.get("user_id")
     return users.get(session, user_id) if user_id is not None else None
 
 
-CurrentUser = Annotated[User | None, Depends(get_current_user)]
+CurrentUser = Annotated[Optional[User], Depends(get_current_user)]
 
 
 def require_user(user: CurrentUser) -> User:

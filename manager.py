@@ -3,7 +3,7 @@ import getpass
 import os
 import secrets
 import shutil
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import delete
 from sqlalchemy.engine import make_url
@@ -40,7 +40,7 @@ def backup(directory):
     backups = sorted(os.listdir(directory))
     if len(backups) > 10 and os.path.isfile(os.path.join(directory, backups[0])):
         os.remove(os.path.join(directory, backups[0]))
-    stamp = datetime.now(UTC).strftime("%Y-%m-%d_%H-%M-%S")
+    stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d_%H-%M-%S")
     shutil.copy(url.database, os.path.join(directory, f"maindb_{stamp}.db"))
 
 

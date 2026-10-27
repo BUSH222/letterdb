@@ -1,3 +1,5 @@
+from typing import List, Optional
+
 from sqlalchemy import ForeignKey, Integer, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -50,26 +52,26 @@ class Letter(Base):
     __tablename__ = "letterdb"
 
     catalogue: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
-    date: Mapped[str | None] = mapped_column(Text)
-    addressee: Mapped[str | None] = mapped_column("adressee", Text)  # column name typo is legacy
-    contents_txt: Mapped[str | None] = mapped_column(Text)
-    imagelink: Mapped[str | None] = mapped_column(Text)
-    comments: Mapped[str | None] = mapped_column(Text)
-    notes: Mapped[str | None] = mapped_column(Text)
+    date: Mapped[Optional[str]] = mapped_column(Text)
+    addressee: Mapped[Optional[str]] = mapped_column("adressee", Text)  # column name typo is legacy
+    contents_txt: Mapped[Optional[str]] = mapped_column(Text)
+    imagelink: Mapped[Optional[str]] = mapped_column(Text)
+    comments: Mapped[Optional[str]] = mapped_column(Text)
+    notes: Mapped[Optional[str]] = mapped_column(Text)
 
-    keyword_links: Mapped[list[LetterKeyword]] = relationship(
+    keyword_links: Mapped[List[LetterKeyword]] = relationship(
         order_by=LetterKeyword.position, cascade="all, delete-orphan", lazy="selectin"
     )
-    region_links: Mapped[list[LetterRegion]] = relationship(
+    region_links: Mapped[List[LetterRegion]] = relationship(
         order_by=LetterRegion.position, cascade="all, delete-orphan", lazy="selectin"
     )
 
     @property
-    def keywords(self) -> list[str]:
+    def keywords(self) -> List[str]:
         return [link.term.name for link in self.keyword_links]
 
     @property
-    def regions(self) -> list[str]:
+    def regions(self) -> List[str]:
         return [link.term.name for link in self.region_links]
 
 

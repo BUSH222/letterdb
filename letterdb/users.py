@@ -1,14 +1,12 @@
 """Staff users: password hashing and management."""
 
-from typing import TYPE_CHECKING
+from typing import List, Optional
 
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from letterdb.models import User
-
-if TYPE_CHECKING:
-    from sqlalchemy.orm import Session
 
 MIN_PASSWORD_LENGTH = 8
 
@@ -31,15 +29,15 @@ def validate_password(password: str) -> None:
         raise ValueError(f"The password must be at least {MIN_PASSWORD_LENGTH} characters long.")
 
 
-def get(session: Session, user_id: int) -> User | None:
+def get(session: Session, user_id: int) -> Optional[User]:
     return session.get(User, user_id)
 
 
-def get_by_email(session: Session, email: str) -> User | None:
+def get_by_email(session: Session, email: str) -> Optional[User]:
     return session.scalars(select(User).where(User.email == email.strip().lower())).first()
 
 
-def authenticate(session: Session, email: str, password: str) -> User | None:
+def authenticate(session: Session, email: str, password: str) -> Optional[User]:
     """Return the user if the credentials are correct, otherwise None."""
     user = get_by_email(session, email)
     if user is None:
@@ -48,7 +46,7 @@ def authenticate(session: Session, email: str, password: str) -> User | None:
     return user if check_password_hash(user.password_hash, password) else None
 
 
-def all_users(session: Session) -> list[User]:
+def all_users(session: Session) -> List[User]:
     return list(session.scalars(select(User).order_by(User.id)))
 
 
@@ -64,7 +62,7 @@ def create(session: Session, email: str, password: str) -> User:
     return user
 
 
-def update(session: Session, email: str, new_email: str | None = None, new_password: str | None = None) -> None:
+def update(session: Session, email: str, new_email: Optional[str] = None, new_password: Optional[str] = None) -> None:
     """Change the email and/or the password of a user."""
     user = get_by_email(session, email)
     if user is None:

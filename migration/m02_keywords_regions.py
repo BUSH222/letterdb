@@ -8,6 +8,8 @@
 """
 
 from collections import Counter, defaultdict
+from typing import Counter as CounterT
+from typing import DefaultDict, Dict, List, Optional, Tuple, Union
 
 from sqlalchemy import text
 
@@ -23,10 +25,12 @@ KINDS = {
 }
 
 
-def build_terms(rows: list[tuple[int, str | None]]) -> tuple[list[dict[str, int | str]], list[dict[str, int]]]:
+def build_terms(
+    rows: List[Tuple[int, Optional[str]]],
+) -> Tuple[List[Dict[str, Union[int, str]]], List[Dict[str, int]]]:
     """Term rows and link rows for one column, from (catalogue, text) pairs."""
     per_letter = [(catalogue, split_terms(value)) for catalogue, value in rows]
-    spellings: defaultdict[str, Counter[str]] = defaultdict(Counter)
+    spellings: DefaultDict[str, CounterT[str]] = defaultdict(Counter)
     for _, names in per_letter:
         for name in names:
             spellings[fold(name)][name] += 1

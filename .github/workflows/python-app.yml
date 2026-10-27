@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: [ "main", "dev", "dev-3.8" ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
@@ -37,7 +37,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
-          python-version-file: "pyproject.toml"
+          python-version-file: ".python-version"
       
       - name: Install dependencies
         run: |

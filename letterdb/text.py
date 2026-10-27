@@ -1,29 +1,30 @@
 """Helpers that read structure out of the plaintext letter fields."""
 
 import re
+from typing import List, Optional
 
 _YEAR = re.compile(r"\d{4}")
 _TERM_SEPARATORS = re.compile(r"[,;]")
 _WHITESPACE = re.compile(r"\s+")
 
 
-def fold(s: str | None) -> str:
+def fold(s: Optional[str]) -> str:
     """Comparison key: case-insensitive, with ё treated as е."""
     return (s or "").casefold().replace("ё", "е")
 
 
-def extract_year(date: str | None) -> int | None:
+def extract_year(date: Optional[str]) -> Optional[int]:
     """The first four-digit number in a (possibly partial) date such as '1952.02.' or '1952-1955'."""
     match = _YEAR.search(date or "")
     return int(match.group()) if match else None
 
 
-def normalise_name(s: str | None) -> str:
+def normalise_name(s: Optional[str]) -> str:
     """Collapse runs of whitespace and strip."""
     return _WHITESPACE.sub(" ", s or "").strip()
 
 
-def split_terms(s: str | None) -> list[str]:
+def split_terms(s: Optional[str]) -> List[str]:
     """Split a keywords/regions string on ',' and ';', dropping blanks and repeats."""
     terms = []
     seen = set()
@@ -35,7 +36,7 @@ def split_terms(s: str | None) -> list[str]:
     return terms
 
 
-def word_start_rank(name: str, query: str) -> int | None:
+def word_start_rank(name: str, query: str) -> Optional[int]:
     """Whether `query` matches the start of a word in `name` (case-insensitive, ё = е).
 
     0 if `name` itself starts with it, 1 if a later word does, None if neither.

@@ -1,20 +1,19 @@
 """The search page: the full catalogue, a text search, and the filters the catalogue lists link to."""
 
-from typing import TYPE_CHECKING, Annotated
+from typing import Dict, List, Optional
 
 from fastapi import APIRouter, Form, Request
 from fastapi.responses import HTMLResponse
+from typing_extensions import Annotated
 
 from letterdb import letters
+from letterdb.models import Letter
 from letterdb.web import CurrentUser, SessionDep, templates
-
-if TYPE_CHECKING:
-    from letterdb.models import Letter
 
 router = APIRouter()
 
 
-def _render(request: Request, user: CurrentUser, data: list[Letter], active_filter: dict[str, str] | None = None):
+def _render(request: Request, user: CurrentUser, data: List[Letter], active_filter: Optional[Dict[str, str]] = None):
     context = {"data": data, "authenticated": user is not None, "active_filter": active_filter}
     return templates.TemplateResponse(request, "search.html", context)
 

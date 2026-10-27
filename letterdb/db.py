@@ -1,13 +1,10 @@
-from typing import TYPE_CHECKING
+from typing import Iterator
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from letterdb.config import DATABASE_URL
-
-if TYPE_CHECKING:
-    from collections.abc import Iterator
 
 _url = make_url(DATABASE_URL)
 _connect_args = {"check_same_thread": False} if _url.get_backend_name() == "sqlite" else {}

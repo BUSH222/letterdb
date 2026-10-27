@@ -1,18 +1,16 @@
 """Viewing a letter, and the staff pages for creating, editing and deleting letters."""
 
-from typing import TYPE_CHECKING, Annotated
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
+from typing_extensions import Annotated
 
 from letterdb import letters
+from letterdb.models import Letter
 from letterdb.web import CurrentUser, SessionDep, redirect, require_user, templates
-
-if TYPE_CHECKING:
-    from sqlalchemy.orm import Session
-
-    from letterdb.models import Letter
 
 router = APIRouter()
 staff = [Depends(require_user)]
@@ -24,8 +22,8 @@ class LetterForm(BaseModel):
     catalogue: str = ""
     date: str = ""
     addressee: str = ""
-    keywords: list[str] = []  # one form value per tag
-    regions: list[str] = []
+    keywords: List[str] = []  # one form value per tag
+    regions: List[str] = []
     contents_txt: str = ""
     imagelink: str = ""
     comments: str = ""
@@ -54,7 +52,9 @@ def viewitem(request: Request, catalogue: str, session: SessionDep, user: Curren
 
 
 @router.get("/search_keyword_region", dependencies=staff)
-def search_keyword_region(session: SessionDep, keyword: str | None = None, region: str | None = None) -> list[str]:
+def search_keyword_region(
+    session: SessionDep, keyword: Optional[str] = None, region: Optional[str] = None
+) -> List[str]:
     """Existing keywords (?keyword=...) or regions (?region=...) with a word starting with the given text,
     case-insensitive and with ё = е. Used by the tag inputs on the new/edit pages."""
     if (keyword is None) == (region is None):

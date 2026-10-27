@@ -1,9 +1,8 @@
 """Staff login. Intentionally not linked from any page."""
 
-from typing import Annotated
-
 from fastapi import APIRouter, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse
+from typing_extensions import Annotated
 
 from letterdb import users
 from letterdb.web import CurrentUser, SessionDep, redirect, templates
