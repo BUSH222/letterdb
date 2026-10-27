@@ -1,25 +1,16 @@
 {% extends "base.html" %}
-{% block title %}Create new record{% endblock %}
-{% block banner %}{% endblock %}
+{% block title %}Новое письмо{% endblock %}
+{% block banner_title %}Новое письмо{% endblock %}
 {% block footer %}{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-4 py-3">
-  <h2 class="h3">Create new record</h2>
+<div class="container letter-form py-4">
   {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
   <form action="/finalise_new_letter" method="post">
-    <div class="mb-3"><label class="form-label" for="catalogue">Catalogue</label><input type="text" class="form-control" id="catalogue" name="catalogue" value="{{ data.catalogue }}"></div>
-    <div class="mb-3"><label class="form-label" for="date">Date</label><input type="text" class="form-control" id="date" name="date" value="{{ data.date }}"></div>
-    <div class="mb-3"><label class="form-label" for="addressee">Addressee</label><input type="text" class="form-control" id="addressee" name="addressee" value="{{ data.addressee }}"></div>
-    <div class="mb-3"><label class="form-label" for="keywords">Keywords</label><input type="text" class="form-control" id="keywords" name="keywords" value="{{ data.keywords }}"></div>
-    <div class="mb-3"><label class="form-label" for="regions">Regions</label><input type="text" class="form-control" id="regions" name="regions" value="{{ data.regions }}"></div>
-    <div class="mb-3"><label class="form-label" for="contents_txt">Contents Text</label><textarea class="form-control" id="contents_txt" name="contents_txt" rows="10">{{ data.contents_txt }}</textarea></div>
-    <div class="mb-3"><label class="form-label" for="comments">Comments</label><textarea class="form-control" id="comments" name="comments" rows="10">{{ data.comments }}</textarea></div>
-    <div class="mb-3"><label class="form-label" for="notes">Notes</label><textarea class="form-control" id="notes" name="notes" rows="10">{{ data.notes }}</textarea></div>
-    <div class="mb-3"><label class="form-label" for="filename">Filename</label><input type="text" class="form-control" id="filename" name="filename" value="{{ data.filename }}"></div>
-    <div class="mb-3"><label class="form-label" for="imagelink">Image Link</label><textarea class="form-control" id="imagelink" name="imagelink" rows="5">{{ data.imagelink }}</textarea></div>
-    <div class="mb-3"><label class="form-label" for="published">Published (0/1)</label><input type="text" class="form-control" id="published" name="published" value="{{ data.published }}"></div>
-    <input type="submit" class="btn btn-gold" value="Create Record">
+    {% include "_letter_fields.html" %}
+    <button type="submit" class="btn btn-gold mt-5">Создать письмо</button>
   </form>
 </div>
 {% endblock %}
+
+{% block scripts %}<script src="/static/tag_input.js"></script>{% endblock %}

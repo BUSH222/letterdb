@@ -63,8 +63,8 @@
           <td>{{ item.catalogue }}</td>
           <td class="fw-bold">{{ item.date }}</td>
           <td><a href="/search?addressee={{ item.addressee|urlencode }}">{{ item.addressee }}</a></td>
-          <td>{% for t in item.keywords|terms %}<a href="/search?keyword={{ t|urlencode }}">{{ t }}</a>{{ ", " if not loop.last }}{% endfor %}</td>
-          <td>{% for t in item.regions|terms %}<a href="/search?region={{ t|urlencode }}">{{ t }}</a>{{ ", " if not loop.last }}{% endfor %}</td>
+          <td>{% for t in item.keywords %}<a href="/search?keyword={{ t|urlencode }}">{{ t }}</a>{{ ", " if not loop.last }}{% endfor %}</td>
+          <td>{% for t in item.regions %}<a href="/search?region={{ t|urlencode }}">{{ t }}</a>{{ ", " if not loop.last }}{% endfor %}</td>
           <td><a class="btn btn-gold btn-sm d-inline-flex align-items-center gap-2" href="/viewitem/{{ item.catalogue }}" target="_blank"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg>Открыть</a></td>
         </tr>
         {% endfor %}

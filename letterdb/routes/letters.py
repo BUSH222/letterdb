@@ -24,12 +24,10 @@ class LetterForm(BaseModel):
     catalogue: str = ""
     date: str = ""
     addressee: str = ""
-    keywords: str = ""
-    regions: str = ""
+    keywords: list[str] = []  # one form value per tag
+    regions: list[str] = []
     contents_txt: str = ""
-    filename: str = ""
     imagelink: str = ""
-    published: str = ""
     comments: str = ""
     notes: str = ""
 
@@ -38,9 +36,10 @@ LetterFormDep = Annotated[LetterForm, Form()]
 
 
 def _get_or_404(session: Session, catalogue: str) -> Letter:
+    """The letter for a catalogue number from the URL; old zero-padded links such as /viewitem/007 still work."""
     if not catalogue.isdigit():
         raise HTTPException(status_code=400)
-    letter = letters.get(session, catalogue)
+    letter = letters.get(session, int(catalogue))
     if letter is None:
         raise HTTPException(status_code=404)
     return letter
@@ -54,9 +53,21 @@ def viewitem(request: Request, catalogue: str, session: SessionDep, user: Curren
     )
 
 
+@router.get("/search_keyword_region", dependencies=staff)
+def search_keyword_region(session: SessionDep, keyword: str | None = None, region: str | None = None) -> list[str]:
+    """Existing keywords (?keyword=...) or regions (?region=...) with a word starting with the given text,
+    case-insensitive and with ё = е. Used by the tag inputs on the new/edit pages."""
+    if (keyword is None) == (region is None):
+        raise HTTPException(status_code=400, detail="Pass exactly one of ?keyword= or ?region=.")
+    if keyword is not None:
+        return letters.suggest_terms(session, "keyword", keyword)
+    return letters.suggest_terms(session, "region", region or "")
+
+
 @router.get("/newletter", response_class=HTMLResponse, dependencies=staff)
-def newletter(request: Request):
-    return templates.TemplateResponse(request, "newletter.html", {"data": {}, "error": None})
+def newletter(request: Request, session: SessionDep):
+    data = {"catalogue": letters.next_catalogue(session)}
+    return templates.TemplateResponse(request, "newletter.html", {"data": data, "error": None})
 
 
 @router.post("/finalise_new_letter", dependencies=staff)
@@ -73,18 +84,18 @@ def finalise_new_letter(request: Request, session: SessionDep, letter_form: Lett
 @router.get("/edit/{catalogue}", response_class=HTMLResponse, dependencies=staff)
 def edititem(request: Request, catalogue: str, session: SessionDep):
     letter = _get_or_404(session, catalogue)
-    context = {"data": letters.as_dict(letter), "original_catalogue": catalogue, "error": None}
+    context = {"data": letters.as_dict(letter), "original_catalogue": letter.catalogue, "error": None}
     return templates.TemplateResponse(request, "letteredit.html", context)
 
 
 @router.post("/finalise_edit/{catalogue}", dependencies=staff)
 def finalise_edit(request: Request, catalogue: str, session: SessionDep, letter_form: LetterFormDep):
-    _get_or_404(session, catalogue)
+    original = _get_or_404(session, catalogue).catalogue
     form = letter_form.model_dump()
     try:
-        letter = letters.update(session, catalogue, form)
+        letter = letters.update(session, original, form)
     except letters.InvalidLetter as e:
-        context = {"data": form, "original_catalogue": catalogue, "error": str(e)}
+        context = {"data": form, "original_catalogue": original, "error": str(e)}
         return templates.TemplateResponse(request, "letteredit.html", context, status_code=400)
     assert letter is not None  # checked by _get_or_404
     return redirect(f"/viewitem/{letter.catalogue}")
@@ -92,6 +103,5 @@ def finalise_edit(request: Request, catalogue: str, session: SessionDep, letter_
 
 @router.post("/delete/{catalogue}", dependencies=staff)
 def delete_letter(catalogue: str, session: SessionDep):
-    _get_or_404(session, catalogue)
-    letters.delete(session, catalogue)
+    letters.delete(session, _get_or_404(session, catalogue).catalogue)
     return redirect("/search")

@@ -33,3 +33,18 @@ def split_terms(s: str | None) -> list[str]:
             seen.add(fold(term))
             terms.append(term)
     return terms
+
+
+def word_start_rank(name: str, query: str) -> int | None:
+    """Whether `query` matches the start of a word in `name` (case-insensitive, ё = е).
+
+    0 if `name` itself starts with it, 1 if a later word does, None if neither.
+    'лес' matches 'лёсс' and 'совещание по лёссу', but not 'слесарь'.
+    """
+    name, query = fold(normalise_name(name)), fold(normalise_name(query))
+    if not query:
+        return None
+    if name.startswith(query):
+        return 0
+    starts = (i for i in range(1, len(name)) if not name[i - 1].isalnum() and name[i].isalnum())
+    return 1 if any(name.startswith(query, i) for i in starts) else None

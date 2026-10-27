@@ -25,11 +25,11 @@ def list_addressee(request: Request, session: SessionDep):
 
 @router.get("/keywords", response_class=HTMLResponse)
 def list_keywords(request: Request, session: SessionDep):
-    items = letters.term_counts(letters.all_letters(session), "keywords")
+    items = letters.term_counts(session, "keyword")
     return templates.TemplateResponse(request, "list_keywords.html", {"items": items, "total": len(items)})
 
 
 @router.get("/region", response_class=HTMLResponse)
 def list_region(request: Request, session: SessionDep):
-    items = letters.term_counts(letters.all_letters(session), "regions")
+    items = letters.term_counts(session, "region")
     return templates.TemplateResponse(request, "list_region.html", {"items": items, "total": len(items)})

@@ -27,9 +27,9 @@ def get_session() -> Iterator[Session]:
 
 
 def create_tables(force: bool = False) -> None:
-    """Create any missing tables. With `force`, the letters table is dropped first (users are kept)."""
-    from letterdb.models import Letter
+    """Create any missing tables. With `force`, the letter tables are dropped first (users are kept)."""
+    from letterdb.models import User
 
     if force:
-        Base.metadata.drop_all(engine, tables=[Base.metadata.tables[Letter.__tablename__]])
+        Base.metadata.drop_all(engine, tables=[t for t in Base.metadata.sorted_tables if t.name != User.__tablename__])
     Base.metadata.create_all(engine)

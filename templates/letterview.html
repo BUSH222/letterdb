@@ -35,9 +35,8 @@
 </section>
 <section class="ob-page py-4">
   <ul class="list-unstyled mb-0">
-    <li class="mb-3"><b>Опубликован:</b> {{ data.published }}</li>
-    <li class="mb-3"><b>Ключевые слова:</b> {% for t in data.keywords|terms %}<a href="/search?keyword={{ t|urlencode }}">{{ t }}</a>{{ ", " if not loop.last }}{% endfor %}</li>
-    <li class="mb-1"><b>Регион:</b> {% for t in data.regions|terms %}<a href="/search?region={{ t|urlencode }}">{{ t }}</a>{{ ", " if not loop.last }}{% endfor %}</li>
+    <li class="mb-3"><b>Ключевые слова:</b> {% for t in data.keywords %}<a href="/search?keyword={{ t|urlencode }}">{{ t }}</a>{{ ", " if not loop.last }}{% endfor %}</li>
+    <li class="mb-1"><b>Регион:</b> {% for t in data.regions %}<a href="/search?region={{ t|urlencode }}">{{ t }}</a>{{ ", " if not loop.last }}{% endfor %}</li>
     <li><b>ID:</b> {{ data.catalogue }}</li>
   </ul>
 </section>

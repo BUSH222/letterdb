@@ -10,10 +10,8 @@ from sqlalchemy.orm import Session
 from letterdb import users
 from letterdb.db import get_session
 from letterdb.models import User
-from letterdb.text import split_terms
 
 templates = Jinja2Templates(directory="templates")
-templates.env.filters["terms"] = split_terms
 templates.env.finalize = lambda value: "" if value is None else value  # NULL columns render as empty
 
 SessionDep = Annotated[Session, Depends(get_session)]
