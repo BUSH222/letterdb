@@ -1,16 +1,23 @@
 import os
 
-from dotenv import find_dotenv, load_dotenv, set_key
+from dotenv import load_dotenv, set_key
 
-dotenv_file = find_dotenv(usecwd=True)
-if not dotenv_file:
-    with open(".env", "x"):
+# The project root. Paths are resolved from here, not from the working directory,
+# because the server (uvicorn, gunicorn, systemd...) may start from another working directory.
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+dotenv_file = os.path.join(BASE_DIR, ".env")
+if not os.path.exists(dotenv_file):
+    with open(dotenv_file, "x"):
         pass
-    dotenv_file = find_dotenv(usecwd=True)
 load_dotenv(dotenv_file)  # load secret keys
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///maindb.db")
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///" + os.path.join(BASE_DIR, "maindb.db"))
 DOC_TXT_REL_DIR = "documents-txt"
+TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+# Largest accepted request body in bytes (forms only carry text, so 1 MB is plenty)
+MAX_REQUEST_BODY = int(os.environ.get("MAX_REQUEST_BODY", 1024 * 1024))
 
 
 def secret_key() -> str:
