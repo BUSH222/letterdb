@@ -8,10 +8,11 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from letterdb import users
+from letterdb.config import TEMPLATES_DIR
 from letterdb.db import get_session
 from letterdb.models import User
 
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory=TEMPLATES_DIR)
 templates.env.finalize = lambda value: "" if value is None else value  # NULL columns render as empty
 
 SessionDep = Annotated[Session, Depends(get_session)]
