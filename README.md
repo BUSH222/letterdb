@@ -7,7 +7,7 @@ This repository contains the source code for LetterDB, a web application that al
 ## Installation
 1) Clone the repository to your local machine.
 2) Install [uv](https://docs.astral.sh/uv/) and run `uv sync` to create the virtual environment and install the dependencies.
-3) (Development) Run `uv run pre-commit install` to enable the ruff and ty hooks.
+3) (Development) Run `uv tool install pre-commit` and then `pre-commit install` to enable the ruff and ty hooks.
 4) Use the built in `manager` tool to quickly set everything up:
     - open terminal and cd to the directory of the project
     - run `uv run manager.py quick_setup --email=<email>` (you will be prompted for a password; `--password` is also accepted)

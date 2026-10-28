@@ -16,6 +16,8 @@ DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///" + os.path.join(BASE_D
 DOC_TXT_REL_DIR = "documents-txt"
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 STATIC_DIR = os.path.join(BASE_DIR, "static")
+# Largest accepted request body in bytes (forms only carry text, so 1 MB is plenty)
+MAX_REQUEST_BODY = int(os.environ.get("MAX_REQUEST_BODY", 1024 * 1024))
 
 
 def secret_key() -> str:

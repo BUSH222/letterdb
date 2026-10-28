@@ -1,0 +1,21 @@
+# MOVE THIS FILE TO ~/hostname.nichost.ru/docs
+
+AddHandler wsgi-script .wsgi
+Options +ExecCGI
+
+# Refuse request bodies over 1 MB before they reach the app (matches MAX_REQUEST_BODY in letterdb/config.py).
+# Only affects POST/PUT bodies; GETs, static files and certbot's ACME challenges have none.
+LimitRequestBody 1048576
+
+RewriteEngine on
+
+# Force HTTPS (nginx terminates TLS and sets X-Forwarded-Proto),
+# but keep ACME challenges reachable over HTTP for certbot renewals
+RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+RewriteCond %{REQUEST_URI} !^/\.well-known/acme-challenge/
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# Send everything that isn't a real file to the letterdb app.
+# END (not L) stops .htaccess from being re-applied to the rewritten URI.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ /app.wsgi/$1 [QSA,PT,END]
